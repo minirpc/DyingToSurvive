@@ -1,5 +1,7 @@
 package com.dyingtosurvive.rpccore;
 
+import com.mashape.unirest.http.Unirest;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +53,7 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
         }
 
         //
-        String url = "http://127.0.0.1:8080/tripservice/internal/";
+        String url = "http://127.0.0.1:8080/rpcserver";
 
         System.out.println(method.getDeclaringClass().getName());
         System.out.println(method.getName());
@@ -88,11 +90,9 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
             System.out.println(mapurl);
         }
         url = url.concat(mapurl);
-
-        //CloseableHttpClient httpClient  = HttpClientFactory.getHttpClientWithRetry();
-        //String retData = JavaClientHelper.instance().sendHttpGetRequest(httpClient, url.toString());
-        return null;
+        System.out.println("url :" + url);
+        //String retData = Unirest.get(url).queryString("name", name).asJson().getBody().getObject();
+        Unirest.get(url).queryString("name", null).asJson().getBody().getObject();
+        return "456";
     }
-
-
 }

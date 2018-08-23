@@ -29,5 +29,7 @@ public class TestHelloController {
         String result = testRestTemplate.getForObject("/hello?helloMessage=123", String.class);
         Assert.assertEquals("123", result);
     }
+
+
 }
 
