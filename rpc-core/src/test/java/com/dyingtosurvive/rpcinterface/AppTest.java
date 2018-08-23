@@ -1,4 +1,4 @@
-package dyingtosurvive.com;
+package com.dyingtosurvive.rpcinterface;
 
 import static org.junit.Assert.assertTrue;
 
