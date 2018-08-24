@@ -92,7 +92,7 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
         url = url.concat(mapurl);
         System.out.println("url :" + url);
         //String retData = Unirest.get(url).queryString("name", name).asJson().getBody().getObject();
-        Unirest.get(url).queryString("name", null).asJson().getBody().getObject();
-        return "456";
+        String result = Unirest.get(url).asString().getBody();
+        return result;
     }
 }

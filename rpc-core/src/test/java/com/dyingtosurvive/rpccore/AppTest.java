@@ -12,7 +12,7 @@ public class AppTest {
 
         try {
             System.out.println(
-                Unirest.get("http://www.baidu.com").asJson());
+                Unirest.get("http://127.0.0.1:8080/rpcserver/hello?helloMessage=11111").asString().getBody());
         } catch (UnirestException e) {
             e.printStackTrace();
         }
