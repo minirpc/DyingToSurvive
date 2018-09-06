@@ -2,18 +2,24 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:rpc="http://code.mindflow.com/schema/rpc"
        xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:rpc="http://code.mindflow.com/schema/rpc"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://code.mindflow.com/schema/rpc http://code.mindflow.com/schema/rpc/rpc.xsd
-       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
-       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+   http://code.mindflow.com/schema/rpc http://code.mindflow.com/schema/rpc/rpc.xsd
+   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
     <context:annotation-config/>
     <context:component-scan base-package="com.dyingtosurvive"/>
 
     <context:property-placeholder location="classpath:application.properties" />
 
     <rpc:registry protocol="zookeeper" address="${registry.address}" />
+<!--
+    <rpc:reference id="helloService" interface="com.dyingtosurvive.rpcinterface.HelloService" group="group1" />
+-->
+    <rpc:service interface="com.dyingtosurvive.rpcinterface.HelloService" ref="helloService" group="group1" version="1.0.0" />
 
 </beans>

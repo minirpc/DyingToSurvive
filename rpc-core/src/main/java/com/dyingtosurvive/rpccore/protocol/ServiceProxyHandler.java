@@ -1,7 +1,6 @@
-package com.dyingtosurvive.rpccore;
+package com.dyingtosurvive.rpccore.protocol;
 
 import com.mashape.unirest.http.Unirest;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

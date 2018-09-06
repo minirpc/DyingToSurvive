@@ -1,4 +1,4 @@
-package com.dyingtosurvive.rpccore;
+package com.dyingtosurvive.rpccore.protocol;
 
 
 import java.lang.reflect.Proxy;
