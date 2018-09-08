@@ -61,7 +61,7 @@ public class RPCBeanDefinitionParser implements BeanDefinitionParser {
 
         //解析属性
         if (RegistryConfig.class.equals(beanClass)) {
-            //RPCNamespaceHandler.registryDefineNames.add(id);
+            RPCNamespaceHandler.registryDefineNames.add(id);
             parseCommonProperty("protocol", null, element, bd, parserContext);
             parseCommonProperty("address", null, element, bd, parserContext);
             parseCommonProperty("connect-timeout", "connectTimeout", element, bd, parserContext);
@@ -70,7 +70,7 @@ public class RPCBeanDefinitionParser implements BeanDefinitionParser {
             parseCommonProperty("password", null, element, bd, parserContext);
             parseCommonProperty("default", "isDefault", element, bd, parserContext);
         } else if (ReferenceConfigBean.class.equals(beanClass)) {
-            //MangoNamespaceHandler.referenceConfigDefineNames.add(id);
+            RPCNamespaceHandler.referenceConfigDefineNames.add(id);
 
             parseCommonProperty("interface", "interfaceName", element, bd, parserContext);
 
@@ -87,7 +87,7 @@ public class RPCBeanDefinitionParser implements BeanDefinitionParser {
             parseCommonProperty("check", null, element, bd, parserContext);
 
         } else if (ServiceConfigBean.class.equals(beanClass)) {
-            //MangoNamespaceHandler.serviceConfigDefineNames.add(id);
+            RPCNamespaceHandler.serviceConfigDefineNames.add(id);
 
             parseCommonProperty("interface", "interfaceName", element, bd, parserContext);
 

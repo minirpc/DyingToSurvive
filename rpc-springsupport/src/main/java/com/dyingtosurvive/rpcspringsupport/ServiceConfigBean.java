@@ -1,7 +1,12 @@
 package com.dyingtosurvive.rpcspringsupport;
 
 
+import com.dyingtosurvive.rpccore.common.URL;
+import com.dyingtosurvive.rpccore.common.ZKNode;
 import com.dyingtosurvive.rpccore.register.RegistryConfig;
+import com.dyingtosurvive.rpccore.registry.Registry;
+import com.dyingtosurvive.rpccore.registry.RegistryFactory;
+import com.dyingtosurvive.rpcregistryzk.ZookeeperRegistryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -11,7 +16,9 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -19,20 +26,20 @@ import java.util.List;
  *
  * @author Ricky Fung
  */
-public class ServiceConfigBean<T> implements BeanFactoryAware,
-    InitializingBean,
-    ApplicationListener<ContextRefreshedEvent>,
-    DisposableBean {
-
+public class ServiceConfigBean<T>
+    implements BeanFactoryAware, InitializingBean, ApplicationListener<ContextRefreshedEvent>, DisposableBean {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    private transient BeanFactory beanFactory;
     protected String interfaceName;
     protected String group;
     protected String version;
     protected Integer timeout;
     protected Integer retries;
-
+    // 注册中心的配置列表
+    protected List<RegistryConfig> registries;
+    // 是否进行check，如果为true，则在监测失败后抛异常
+    protected Boolean check = Boolean.TRUE;
+    protected String id;
+    private transient BeanFactory beanFactory;
     private Class<T> interfaceClass;
     private T ref;
 
@@ -51,14 +58,6 @@ public class ServiceConfigBean<T> implements BeanFactoryAware,
     public void setInterfaceClass(Class<T> interfaceClass) {
         this.interfaceClass = interfaceClass;
     }
-
-    // 注册中心的配置列表
-    protected List<RegistryConfig> registries;
-
-    // 是否进行check，如果为true，则在监测失败后抛异常
-    protected Boolean check = Boolean.TRUE;
-
-    protected String id ;
 
     public String getId() {
         return id;
@@ -132,47 +131,42 @@ public class ServiceConfigBean<T> implements BeanFactoryAware,
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         logger.info("onApplicationEvent called");
-        //配置了几个service,此方法就会被调用几次
-        //在此方法中调用父类的export方法　 此方法在afterPropertiesSet方法之后调用
-       /* if (!isExported()) {
-            //export导出，意为bean和registry,protocol都准备好了，需要对外暴露服务了
-            //暴露服务需要有：注册中心，协议，nettyserver,目前都准备齐了
-            export();
-        }*/
+        //注册地址到zookeeper中
+        ///mango/default_rpc/mango.demo.service.UserService/providers
+        //注册中心数据内容为：dyingtosurvive/rpc/包名/providers ,值为ip:port/项目名
+        URL url= new URL();
+        url.setIp("10.42.0.7");
+        url.setPort("2181");
+
+        ZKNode node = new ZKNode();
+        node.setIp("127.0.0.1");
+        node.setPort("8080");
+        node.setPackageName("com.dyingtosurvive.rpcinterface.IHelloService");
+        node.setRole("providers");
+        node.setProjectName("rpc-server");
+        RegistryFactory registryFactory = new ZookeeperRegistryFactory();
+        Registry registry = registryFactory.getRegistry(url);
+        registry.register(node);
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        //配置了几个service,此方法就会被调用几次
-        logger.debug("check service interface:%s config");
-        //检查注册中心
+        logger.info("afterPropertiesSet called");
         checkRegistryConfig();
     }
 
     @Override
     public void destroy() throws Exception {
-        //super.destroy0();
+        logger.info("destroy called");
     }
 
     private void checkRegistryConfig() {
-        //判断注册中心是否已经有值了，没有值则从bean中取
-        /*if (CollectionUtil.isEmpty(getRegistries())) {
-            for (String name : MangoNamespaceHandler.registryDefineNames) {
-                //beanfactory为得到的bean
-                RegistryConfig rc = beanFactory.getBean(name, RegistryConfig.class);
-                if (rc == null) {
-                    continue;
-                }
-                if (MangoNamespaceHandler.registryDefineNames.size() == 1) {
-                    //设置注册中心
-                    setRegistry(rc);
-                } else if (rc.isDefault() != null && rc.isDefault().booleanValue()) {
-                    setRegistry(rc);
-                }
+        if (CollectionUtils.isEmpty(registries)) {
+            for (String name : RPCNamespaceHandler.registryDefineNames) {
+                RegistryConfig registryConfig = beanFactory.getBean(name, RegistryConfig.class);
+                System.out.println(registryConfig.getAddress());
+                registries = Collections.singletonList(registryConfig);
             }
         }
-        if (CollectionUtil.isEmpty(getRegistries())) {
-            setRegistry(FrameworkUtils.getDefaultRegistryConfig());
-        }*/
     }
 }

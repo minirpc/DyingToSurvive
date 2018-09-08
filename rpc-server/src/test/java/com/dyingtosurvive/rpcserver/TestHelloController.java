@@ -27,9 +27,8 @@ public class TestHelloController {
     @Test
     public void testHello() throws Exception {
         String result = testRestTemplate.getForObject("/hello?helloMessage=123", String.class);
+        System.in.read();
         Assert.assertEquals("123", result);
     }
-
-
 }
 
