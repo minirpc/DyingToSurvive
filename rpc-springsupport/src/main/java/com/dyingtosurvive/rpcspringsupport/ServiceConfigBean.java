@@ -6,7 +6,7 @@ import com.dyingtosurvive.rpccore.common.ZKNode;
 import com.dyingtosurvive.rpccore.register.RegistryConfig;
 import com.dyingtosurvive.rpccore.registry.Registry;
 import com.dyingtosurvive.rpccore.registry.RegistryFactory;
-import com.dyingtosurvive.rpcregistryzk.ZookeeperRegistryFactory;
+import com.dyingtosurvive.rpccore.spi.RPCServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -19,7 +19,9 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ServiceLoader;
 
 /**
  * ${DESCRIPTION}
@@ -130,23 +132,34 @@ public class ServiceConfigBean<T>
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+
         logger.info("onApplicationEvent called");
         //注册地址到zookeeper中
         ///mango/default_rpc/mango.demo.service.UserService/providers
         //注册中心数据内容为：dyingtosurvive/rpc/包名/providers ,值为ip:port/项目名
-        URL url= new URL();
-        url.setIp("10.42.0.7");
-        url.setPort("2181");
 
-        ZKNode node = new ZKNode();
-        node.setIp("127.0.0.1");
-        node.setPort("8080");
-        node.setPackageName("com.dyingtosurvive.rpcinterface.IHelloService");
-        node.setRole("providers");
-        node.setProjectName("rpc-server");
-        RegistryFactory registryFactory = new ZookeeperRegistryFactory();
-        Registry registry = registryFactory.getRegistry(url);
-        registry.register(node);
+        String[] registryInfo = registries.get(0).getAddress().split(":");
+        URL url = new URL();
+        url.setIp(registryInfo[0]);
+        url.setPort(registryInfo[1]);
+
+
+        //使用jdk提供的ServiceLoader来做ＳＰＩ设计
+        ServiceLoader<RegistryFactory> factories = RPCServiceLoader.load(RegistryFactory.class);
+        Iterator<RegistryFactory> operationIterator = factories.iterator();
+        while (operationIterator.hasNext()) {
+            RegistryFactory operation = operationIterator.next();
+            Registry registry = operation.getRegistry(url);
+            ZKNode node = new ZKNode();
+            //todo 待从配置文件中得到ip和port和servername
+            node.setIp("127.0.0.1");
+            node.setPort("8080");
+            System.out.println("interfaceName" + interfaceName);
+            node.setPackageName("com.dyingtosurvive.rpcinterface.IHelloService");
+            node.setRole("providers");
+            node.setProjectName("rpc-server");
+            registry.register(node);
+        }
     }
 
     @Override

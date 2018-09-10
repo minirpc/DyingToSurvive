@@ -10,11 +10,6 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
-/**
- * ${DESCRIPTION}
- *
- * @author Ricky Fung
- */
 public class ReferenceConfigBean<T> implements
     FactoryBean<T>, BeanFactoryAware,
     InitializingBean, DisposableBean {
@@ -48,25 +43,7 @@ public class ReferenceConfigBean<T> implements
     @Override
     public void afterPropertiesSet() throws Exception {
         System.out.println("afterPropertiesSet");
-        /*logger.debug("check reference interface:%s config", getInterfaceName());
-        //检查依赖的配置
-        checkApplication();
-        checkProtocolConfig();
         checkRegistryConfig();
-
-        if(StringUtils.isEmpty(getGroup())) {
-            setGroup(URLParam.group.getValue());
-        }
-        if(StringUtils.isEmpty(getVersion())) {
-            setVersion(URLParam.version.getValue());
-        }
-
-        if(getTimeout()==null) {
-            setTimeout(URLParam.requestTimeout.getIntValue());
-        }
-        if(getRetries()==null) {
-            setRetries(URLParam.retries.getIntValue());
-        }*/
     }
 
     @Override

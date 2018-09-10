@@ -108,6 +108,7 @@ public class RPCBeanDefinitionParser implements BeanDefinitionParser {
 
             parseCommonProperty("group", null, element, bd, parserContext);
             parseCommonProperty("version", null, element, bd, parserContext);
+
         }
         return bd;
     }
