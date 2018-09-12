@@ -33,7 +33,10 @@ public class AppTest {
             node.setRole("providers");
             node.setProjectName("rpc-server");
             registry.register(node);
+            registry.discoverService(node);
         }
+
+
         try {
             System.in.read();
         } catch (IOException e) {

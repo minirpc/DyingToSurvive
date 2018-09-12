@@ -18,6 +18,6 @@
     <rpc:registry protocol="zookeeper" address="${registry.address}" />
 
     <!--refer services -->
-    <rpc:reference id="helloService" interface="com.dyingtosurvive.rpcinterface.HelloService" group="group1" />
+    <rpc:reference id="helloService" interface="com.dyingtosurvive.rpcinterface.IHelloService" group="group1" />
 
 </beans>

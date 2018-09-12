@@ -7,6 +7,9 @@ import com.dyingtosurvive.rpccore.common.ZKNode;
 import com.dyingtosurvive.rpccore.registry.Registry;
 import org.I0Itec.zkclient.ZkClient;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 
 public class ZookeeperRegistry implements Registry {
@@ -27,11 +30,33 @@ public class ZookeeperRegistry implements Registry {
         if (!zkClient.exists(path)) {
             zkClient.createPersistent(path, true);
         }
-        zkClient.createEphemeral(path +"/" + node.getIp() + ":" + node.getPort(), node.getProjectName());
+        zkClient.createEphemeral(path + "/" + node.getIp() + ":" + node.getPort(), node.getProjectName());
     }
 
     @Override
     public void unregister(ZKNode url) {
 
+    }
+
+    @Override
+    public List<ZKNode> discoverService(ZKNode node) {
+        String parentPath = ZKUtils.parseNodeToPath(node);
+        List<String> children = new ArrayList<String>();
+        if (zkClient.exists(parentPath)) {
+            children = zkClient.getChildren(parentPath);
+        }
+        List<ZKNode> nodes = new ArrayList<>();
+        for (String str : children) {
+            System.out.println("url:" + str);
+            String projectName = zkClient.readData(parentPath + "/" + str);
+            System.out.println("projectname:" + projectName);
+            ZKNode zkNode = new ZKNode();
+            String[] ips = str.split(":");
+            zkNode.setIp(ips[0]);
+            zkNode.setPort(ips[1]);
+            zkNode.setProjectName(projectName);
+            nodes.add(zkNode);
+        }
+        return nodes;
     }
 }

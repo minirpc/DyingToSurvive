@@ -13,11 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HelloController {
     @Autowired
-    private ServiceCreateHelper serviceCreateHelper;
+    private IHelloService helloService;
 
     @RequestMapping(value = "/hello")
     public String helloDyingToService(@RequestParam(value = "helloMessage") String helloMessage) {
-        IHelloService helloService = serviceCreateHelper.buildService(IHelloService.class);
+       /* IHelloService helloService = serviceCreateHelper.buildService(IHelloService.class);
+        return helloService.helloDyingToService(helloMessage);*/
         return helloService.helloDyingToService(helloMessage);
     }
 }

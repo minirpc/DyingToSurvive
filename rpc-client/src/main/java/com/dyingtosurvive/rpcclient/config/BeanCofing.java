@@ -7,10 +7,6 @@ import org.springframework.context.annotation.Configuration;
 
 
 @Configuration
-@ComponentScan("com.dyingtosurvive.rpccore.*")
 public class BeanCofing {
-    @Bean
-    public ServiceCreateHelper serviceCreateHelper() {
-        return new ServiceCreateHelper();
-    }
+
 }
