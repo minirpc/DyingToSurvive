@@ -13,6 +13,7 @@
 
   <modules>
     <module>rpc-core</module>
+    <module>rpc-loadbalance</module>
     <module>rpc-interface</module>
     <module>rpc-client</module>
     <module>rpc-server</module>

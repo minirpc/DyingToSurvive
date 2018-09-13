@@ -2,6 +2,7 @@ package com.dyingtosurvive.rpccore.protocol;
 
 import com.dyingtosurvive.rpccore.common.URL;
 import com.dyingtosurvive.rpccore.common.ZKNode;
+import com.dyingtosurvive.rpccore.lb.LoadBalance;
 import com.dyingtosurvive.rpccore.register.RegistryConfig;
 import com.dyingtosurvive.rpccore.registry.Registry;
 import com.dyingtosurvive.rpccore.registry.RegistryFactory;
@@ -62,11 +63,16 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
         }
 
         List<ZKNode> nodes = getServerInfo();
-
-
+        ZKNode choseNode = null;
+        ServiceLoader<LoadBalance> factories = RPCServiceLoader.load(LoadBalance.class);
+        Iterator<LoadBalance> operationIterator = factories.iterator();
+        while (operationIterator.hasNext()) {
+            LoadBalance operation = operationIterator.next();
+            choseNode = operation.select(nodes);
+        }
         //动态拼装url
         String url =
-            "http://" + nodes.get(0).getIp() + ":" + nodes.get(0).getPort() + "/" + nodes.get(0).getProjectName();
+            "http://" + choseNode.getIp() + ":" + choseNode.getPort() + "/" + choseNode.getProjectName();
 
         System.out.println(method.getDeclaringClass().getName());
         System.out.println(method.getName());

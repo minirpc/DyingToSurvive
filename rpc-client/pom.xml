@@ -67,6 +67,11 @@
             <version>1.0.1</version>
         </dependency>
         <dependency>
+            <groupId>com.dyingtosurvive</groupId>
+            <artifactId>rpc-loadbalance</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
