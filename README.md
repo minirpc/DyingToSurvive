@@ -16,18 +16,16 @@ rpc-registry: 服务注册中心
 
 rpc-springsupport: spring支持
 
-todo 
-1.服务注册中心　使用配置文件配置服务注册中心
-2.使用lb和注册中心，需要是ＳＰＩ设计，确定服务注册中心的负载策略
-3.使用spring自定义xml来解析注册中心和自动装配
-4.还将学会自定义xml标签
-5.加入service与reference的配置
+rpc-monitor:管理中心,对外提供api接口
 
-当动态代理访问时，先调用出registry,再由registry找出支持此服务的url然后再调用　
+rpc-loadbalance:自定义负载均衡器
 
+rpc-config:配置中心jar包，rpc-monitor依赖配置中心
 
+rpc-trace:rpc调用跟踪，调用值
+
+### 开发记录
 rpc-server　负责注册服务　(服务名：项目名，接口地址，参数)
-
 
 rpc-client　负责使用服务：
 0.根据配置的注册中心找到注册中心
@@ -36,13 +34,7 @@ rpc-client　负责使用服务：
 3.使用ＬＢ算法命中一台机器　
 4.拼装请求url(项目名有了，接口地址也有了，参数也有了，)
 5.发送请求
-
-
-
-计划增加服务中心管理平台
-
-
-
+6.当动态代理访问时，先调用出registry,再由registry找出支持此服务的url然后再调用　
 
 
 ### 实现效果　
@@ -73,10 +65,28 @@ productservice中有服务（产品列表，产品操作）
 
 服务Ａ／Ｂ　testing
 
+服务配置中心
+
+服务追踪　
+
+### todo 
+1.服务注册中心　使用配置文件配置服务注册中心  OK
+2.使用lb和注册中心，需要是ＳＰＩ设计，确定服务注册中心的负载策略 OK
+3.使用spring自定义xml来解析注册中心和自动装配 OK
+4.还将学会自定义xml标签 OK
+5.加入service与reference的配置 OK
+6.增加调用的回调设计　
+7.增加调用日志的处理：服务流量
+8.增加权重，监测中心
+9.rpc-monitor是一个web项目,用于提供管理权重，查看服务流量，查看调用链
+10.rpc-config功能:配置服务权重　
+11.rpc-trace-es:封装调用日志，提供查询接口
 
 
-todo 
-增加调用的回调设计　
+
+
+
+
 
 
 
