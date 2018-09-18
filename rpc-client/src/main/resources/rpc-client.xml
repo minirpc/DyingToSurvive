@@ -3,21 +3,23 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:rpc="http://code.mindflow.com/schema/rpc"
+       xmlns:rpc="http://code.dyingtosurvive.com/schema/rpc"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://code.mindflow.com/schema/rpc http://code.mindflow.com/schema/rpc/rpc.xsd
+       http://code.dyingtosurvive.com/schema/rpc http://code.dyingtosurvive.com/schema/rpc/rpc.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <context:annotation-config/>
-    <context:component-scan base-package="com.dyingtosurvive"/>
+    <context:component-scan base-package="com.dyingtosurvive.rpcclient"/>
 
-    <context:property-placeholder location="classpath:application.properties" />
+    <context:property-placeholder location="classpath:application.properties"/>
 
-    <rpc:registry protocol="zookeeper" address="${registry.address}" />
+    <rpc:application name="${application.name}" ip="${server.ip}" port="${server.port}"
+                     rootPath="${server.servlet.context-path}"/>
 
-    <!--refer services -->
-    <rpc:reference id="helloService" interface="com.dyingtosurvive.rpcinterface.IHelloService" group="group1" />
+    <rpc:registry protocol="zookeeper" address="${registry.address}"/>
+
+    <rpc:reference id="helloService" interface="com.dyingtosurvive.rpcinterface.IHelloService"/>
 
 </beans>

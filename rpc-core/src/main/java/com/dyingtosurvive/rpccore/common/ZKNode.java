@@ -3,8 +3,8 @@ package com.dyingtosurvive.rpccore.common;
 import java.io.Serializable;
 
 /**
- * dyingtosurvive/rpc/包名/providers ,值为ip:port/项目名
- * Created by change-solider on 18-9-8.
+ *
+ * Created by change-solider on 2018-9-8.
  */
 public class ZKNode implements Serializable {
     private String packageName;
@@ -51,16 +51,5 @@ public class ZKNode implements Serializable {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
-    }
-
-
-    @Override public String toString() {
-        return "ZKNode{" +
-            "packageName='" + packageName + '\'' +
-            ", role='" + role + '\'' +
-            ", ip='" + ip + '\'' +
-            ", port='" + port + '\'' +
-            ", projectName='" + projectName + '\'' +
-            '}';
     }
 }

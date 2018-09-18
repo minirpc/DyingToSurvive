@@ -1,6 +1,7 @@
 package com.dyingtosurvive.rpcspringsupport;
 
 
+import com.dyingtosurvive.rpccore.common.ApplicationConfig;
 import com.dyingtosurvive.rpccore.register.RegistryConfig;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -12,110 +13,79 @@ import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 
+/**
+ * 自定义bean解析器
+ * created by changesolider on 2018-08-22
+ */
 public class RPCBeanDefinitionParser implements BeanDefinitionParser {
-
+    //存储需要解析的bean
     private final Class<?> beanClass;
 
-    private final boolean required;
-
-    public RPCBeanDefinitionParser(Class<?> beanClass, boolean required) {
+    public RPCBeanDefinitionParser(Class<?> beanClass) {
         this.beanClass = beanClass;
-        this.required = required;
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private static BeanDefinition parse(Element element, ParserContext parserContext, Class<?> beanClass,
-        boolean required)
+    @Override
+    public BeanDefinition parse(Element element, ParserContext parserContext) {
+        try {
+            return parseRPCBean(element, parserContext);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    private BeanDefinition parseRPCBean(Element element, ParserContext parserContext)
         throws ClassNotFoundException {
-        //RootBeanDefinition:概念化的bean，会绑定具体的bean
-        RootBeanDefinition bd = new RootBeanDefinition();
-        //设置bean所代表的对象
-        bd.setBeanClass(beanClass);
-        // 不允许lazy init
-        bd.setLazyInit(false);
+        //定义bean
+        RootBeanDefinition beanDefinition = new RootBeanDefinition();
+        beanDefinition.setBeanClass(beanClass);
+        beanDefinition.setLazyInit(false);
 
-        // 如果没有id则按照规则生成一个id,注册id到context中
+        //生成beanid
         String id = element.getAttribute("id");
-        if ((id == null || id.length() == 0) && required) {
-            String generatedBeanName = element.getAttribute("name");
-            if (generatedBeanName == null || generatedBeanName.length() == 0) {
-                generatedBeanName = element.getAttribute("interface");
-            }
-            if (generatedBeanName == null || generatedBeanName.length() == 0) {
-                generatedBeanName = beanClass.getName();
-            }
-            id = generatedBeanName;
-            int counter = 2;
-            while (parserContext.getRegistry().containsBeanDefinition(id)) {
-                id = generatedBeanName + (counter++);
+        if (StringUtils.isEmpty(id)) {
+            //rpc:server
+            id = element.getAttribute("interface");
+            if (StringUtils.isEmpty(id)) {
+                //rpc:registry,rpc:application
+                id = beanClass.getName();
             }
         }
-        if (id != null && id.length() > 0) {
-            if (parserContext.getRegistry().containsBeanDefinition(id)) {
-                throw new IllegalStateException("Duplicate spring bean id " + id);
-            }
-            parserContext.getRegistry().registerBeanDefinition(id, bd);
-        }
-        System.out.println("id:" + id);
-        bd.getPropertyValues().addPropertyValue("id", id);
 
+        //判断容器中是否已经存在此bean了
+        if (parserContext.getRegistry().containsBeanDefinition(id)) {
+            throw new IllegalStateException("spring容器中已经存在id为" + id + "的bean!");
+        }
+        //注册
+        parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
+        beanDefinition.getPropertyValues().addPropertyValue("id", id);
         //解析属性
-        if (RegistryConfig.class.equals(beanClass)) {
-            RPCNamespaceHandler.registryDefineNames.add(id);
-            parseCommonProperty("protocol", null, element, bd, parserContext);
-            parseCommonProperty("address", null, element, bd, parserContext);
-            parseCommonProperty("connect-timeout", "connectTimeout", element, bd, parserContext);
-            parseCommonProperty("session-timeout", "sessionTimeout", element, bd, parserContext);
-            parseCommonProperty("username", null, element, bd, parserContext);
-            parseCommonProperty("password", null, element, bd, parserContext);
-            parseCommonProperty("default", "isDefault", element, bd, parserContext);
+        if (ApplicationConfig.class.equals(beanClass)) {
+            RPCNamespaceHandler.registryAppIds.add(id);
+            parseCommonProperty("name", null, element, beanDefinition, parserContext);
+            parseCommonProperty("ip", null, element, beanDefinition, parserContext);
+            parseCommonProperty("port", null, element, beanDefinition, parserContext);
+            parseCommonProperty("rootPath", null, element, beanDefinition, parserContext);
+        } else if (RegistryConfig.class.equals(beanClass)) {
+            RPCNamespaceHandler.registryDefineIds.add(id);
+            parseCommonProperty("protocol", null, element, beanDefinition, parserContext);
+            parseCommonProperty("address", null, element, beanDefinition, parserContext);
         } else if (ReferenceConfigBean.class.equals(beanClass)) {
-            RPCNamespaceHandler.referenceConfigDefineNames.add(id);
-
-            parseCommonProperty("interface", "interfaceName", element, bd, parserContext);
-
-            String registry = element.getAttribute("registry");
-            if (!StringUtils.isEmpty(registry)) {
-                parseMultiRef("registries", registry, bd, parserContext);
-            }
-
-            parseCommonProperty("group", null, element, bd, parserContext);
-            parseCommonProperty("version", null, element, bd, parserContext);
-
-            parseCommonProperty("timeout", null, element, bd, parserContext);
-            parseCommonProperty("retries", null, element, bd, parserContext);
-            parseCommonProperty("check", null, element, bd, parserContext);
-
+            RPCNamespaceHandler.referenceConfigDefineIds.add(id);
+            parseCommonProperty("interface", "interfaceName", element, beanDefinition, parserContext);
         } else if (ServiceConfigBean.class.equals(beanClass)) {
-            RPCNamespaceHandler.serviceConfigDefineNames.add(id);
-
-            parseCommonProperty("interface", "interfaceName", element, bd, parserContext);
-
-            parseSingleRef("ref", element, bd, parserContext);
-
-            String registry = element.getAttribute("registry");
-            if (!StringUtils.isEmpty(registry)) {
-                parseMultiRef("registries", registry, bd, parserContext);
-            }
-
-            String protocol = element.getAttribute("protocol");
-            if (!StringUtils.isEmpty(protocol)) {
-                parseMultiRef("protocols", protocol, bd, parserContext);
-            }
-
-            parseCommonProperty("timeout", null, element, bd, parserContext);
-            parseCommonProperty("retries", null, element, bd, parserContext);
-
-            parseCommonProperty("group", null, element, bd, parserContext);
-            parseCommonProperty("version", null, element, bd, parserContext);
-
+            RPCNamespaceHandler.serviceConfigDefineIds.add(id);
+            parseCommonProperty("interface", "interfaceName", element, beanDefinition, parserContext);
+            parseSingleRef("ref", element, beanDefinition, parserContext);
         }
-        return bd;
+        return beanDefinition;
     }
 
-    private static void parseCommonProperty(String name, String alias, Element element, BeanDefinition bd,
-        ParserContext parserContext) {
 
+
+    private void parseCommonProperty(String name, String alias, Element element, BeanDefinition bd,
+        ParserContext parserContext) {
         String value = element.getAttribute(name);
         if (!StringUtils.isEmpty(value)) {
             String property = alias != null ? alias : name;
@@ -123,17 +93,9 @@ public class RPCBeanDefinitionParser implements BeanDefinitionParser {
         }
     }
 
-    /**
-     * 处理单个引用
-     *
-     * @param property
-     * @param element
-     * @param bd
-     * @param parserContext
-     */
-    private static void parseSingleRef(String property, Element element, BeanDefinition bd,
-        ParserContext parserContext) {
 
+    private void parseSingleRef(String property, Element element, BeanDefinition bd,
+        ParserContext parserContext) {
         String value = element.getAttribute(property);
         if (!StringUtils.isEmpty(value)) {
             if (parserContext.getRegistry().containsBeanDefinition(value)) {
@@ -145,44 +107,6 @@ public class RPCBeanDefinitionParser implements BeanDefinitionParser {
                 }
             }
             bd.getPropertyValues().addPropertyValue(property, new RuntimeBeanReference(value));
-        }
-    }
-
-    /**
-     * 处理多个引用
-     * <p>
-     * 运行时的依赖注入
-     *
-     * @param property
-     * @param value
-     * @param bd
-     * @param parserContext
-     */
-    private static void parseMultiRef(String property, String value, BeanDefinition bd,
-        ParserContext parserContext) {
-        String[] values = value.split("\\s*[,]+\\s*");
-        ManagedList list = null;
-        for (int i = 0; i < values.length; i++) {
-            String v = values[i];
-            if (v != null && v.length() > 0) {
-                if (list == null) {
-                    list = new ManagedList();
-                }
-                list.add(new RuntimeBeanReference(v));
-            }
-        }
-
-        bd.getPropertyValues().addPropertyValue(property, list);
-    }
-
-    @Override
-    public BeanDefinition parse(Element element, ParserContext parserContext) {
-        try {
-
-            return parse(element, parserContext, beanClass, required);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
         }
     }
 }

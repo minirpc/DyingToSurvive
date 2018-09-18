@@ -1,6 +1,7 @@
 package com.dyingtosurvive.rpcspringsupport;
 
 
+import com.dyingtosurvive.rpccore.common.ApplicationConfig;
 import com.dyingtosurvive.rpccore.register.RegistryConfig;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
@@ -8,21 +9,22 @@ import java.util.HashSet;
 import java.util.Set;
 
 
+/**
+ * 自定义命名空间解析器
+ * <p>
+ * created by changesolider on 2018-08-22
+ */
 public class RPCNamespaceHandler extends NamespaceHandlerSupport {
-    //记录bean的id
-    public final static Set<String> registryDefineNames = new HashSet<>();
-    public final static Set<String> referenceConfigDefineNames = new HashSet<>();
-    public final static Set<String> serviceConfigDefineNames = new HashSet<>();
+    public final static Set<String> registryAppIds= new HashSet<>();
+    public final static Set<String> registryDefineIds = new HashSet<>();
+    public final static Set<String> referenceConfigDefineIds = new HashSet<>();
+    public final static Set<String> serviceConfigDefineIds = new HashSet<>();
 
     @Override
     public void init() {
-        System.out.println("hello worlda RPCNamespaceHandler");
-        System.out.println("aaaa");
-        //client bean初始化完成后做一些事
-        registerBeanDefinitionParser("reference", new RPCBeanDefinitionParser(ReferenceConfigBean.class, false));
-        //server bean初始化完成后做一些事
-        registerBeanDefinitionParser("service", new RPCBeanDefinitionParser(ServiceConfigBean.class, true));
-        //bean初始化完成后不需要做任何事
-        registerBeanDefinitionParser("registry", new RPCBeanDefinitionParser(RegistryConfig.class, true));
+        registerBeanDefinitionParser("application", new RPCBeanDefinitionParser(ApplicationConfig.class));
+        registerBeanDefinitionParser("reference", new RPCBeanDefinitionParser(ReferenceConfigBean.class));
+        registerBeanDefinitionParser("service", new RPCBeanDefinitionParser(ServiceConfigBean.class));
+        registerBeanDefinitionParser("registry", new RPCBeanDefinitionParser(RegistryConfig.class));
     }
 }

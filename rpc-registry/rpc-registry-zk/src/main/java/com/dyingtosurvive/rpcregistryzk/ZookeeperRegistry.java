@@ -2,7 +2,7 @@ package com.dyingtosurvive.rpcregistryzk;
 
 
 
-import com.dyingtosurvive.rpccore.common.URL;
+import com.dyingtosurvive.rpccore.common.ZKInfo;
 import com.dyingtosurvive.rpccore.common.ZKNode;
 import com.dyingtosurvive.rpccore.registry.Registry;
 import org.I0Itec.zkclient.ZkClient;
@@ -11,21 +11,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
+/**
+ * ZK实现的注册中心
+ * Created by change-solider on 18-9-18.
+ */
 public class ZookeeperRegistry implements Registry {
     private ZkClient zkClient;
-    private URL url;
+    private ZKInfo zkInfo;
 
-    public ZookeeperRegistry(URL url, ZkClient zkClient) {
+    public ZookeeperRegistry(ZKInfo zkInfo, ZkClient zkClient) {
         this.zkClient = zkClient;
-        this.url = url;
+        this.zkInfo = zkInfo;
     }
 
+    /**
+     * 注册服务
+     *
+     * @param node
+     */
     @Override
-    public void register(ZKNode node) {
-        System.out.println("register is called");
-        System.out.println("node:" + node.getPackageName());
-
+    public void registerService(ZKNode node) {
         String path = ZKUtils.parseNodeToPath(node);
         if (!zkClient.exists(path)) {
             zkClient.createPersistent(path, true);
@@ -33,23 +38,23 @@ public class ZookeeperRegistry implements Registry {
         zkClient.createEphemeral(path + "/" + node.getIp() + ":" + node.getPort(), node.getProjectName());
     }
 
-    @Override
-    public void unregister(ZKNode url) {
 
-    }
-
+    /**
+     * 发现服务
+     *
+     * @param node
+     * @return
+     */
     @Override
     public List<ZKNode> discoverService(ZKNode node) {
         String parentPath = ZKUtils.parseNodeToPath(node);
-        List<String> children = new ArrayList<String>();
-        if (zkClient.exists(parentPath)) {
-            children = zkClient.getChildren(parentPath);
+        if (!zkClient.exists(parentPath)) {
+            return null;
         }
+        List<String> children = zkClient.getChildren(parentPath);
         List<ZKNode> nodes = new ArrayList<>();
         for (String str : children) {
-            System.out.println("url:" + str);
             String projectName = zkClient.readData(parentPath + "/" + str);
-            System.out.println("projectname:" + projectName);
             ZKNode zkNode = new ZKNode();
             String[] ips = str.split(":");
             zkNode.setIp(ips[0]);

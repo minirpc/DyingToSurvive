@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by change-solider on 18-9-8.
  */
-public class URL implements Serializable {
+public class ZKInfo implements Serializable {
     private String ip;
     private String port;
 

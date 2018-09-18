@@ -1,19 +1,20 @@
 package com.dyingtosurvive.rpccore.registry;
 
 
-import com.dyingtosurvive.rpccore.common.URL;
 import com.dyingtosurvive.rpccore.common.ZKNode;
 
 import java.util.List;
 
 /**
- * ${DESCRIPTION}
- *
- * @author Ricky Fung
+ * 注册中心
+ * Created by change-solider on 18-9-18.
  */
 public interface Registry {
 
-    void register(ZKNode url);
-    void unregister(ZKNode url);
-    List<ZKNode> discoverService(ZKNode url);
+    //注册服务
+    void registerService(ZKNode zkNode);
+
+
+    //发现服务　
+    List<ZKNode> discoverService(ZKNode zkNode);
 }

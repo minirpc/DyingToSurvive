@@ -1,4 +1,4 @@
-package com.dyingtosurvive;
+package com.dyingtosurvive.rpcmonitor;
 
 /**
  * Hello world!

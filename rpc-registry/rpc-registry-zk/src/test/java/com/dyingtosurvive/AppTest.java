@@ -2,7 +2,7 @@ package com.dyingtosurvive;
 
 import static org.junit.Assert.assertTrue;
 
-import com.dyingtosurvive.rpccore.common.URL;
+import com.dyingtosurvive.rpccore.common.ZKInfo;
 import com.dyingtosurvive.rpccore.common.ZKNode;
 import com.dyingtosurvive.rpccore.registry.Registry;
 import com.dyingtosurvive.rpccore.registry.RegistryFactory;
@@ -20,7 +20,7 @@ public class AppTest {
      */
     @Test
     public void shouldAnswerWithTrue() {
-        URL url = new URL();
+        ZKInfo url = new ZKInfo();
         url.setIp("10.42.0.6");
         url.setPort("2181");
         RegistryFactory registryFactory = new ZookeeperRegistryFactory();
@@ -32,7 +32,7 @@ public class AppTest {
             node.setPackageName("com.dyingtosurvive.rpcinterface.IHelloService");
             node.setRole("providers");
             node.setProjectName("rpc-server");
-            registry.register(node);
+            registry.registerService(node);
             registry.discoverService(node);
         }
 

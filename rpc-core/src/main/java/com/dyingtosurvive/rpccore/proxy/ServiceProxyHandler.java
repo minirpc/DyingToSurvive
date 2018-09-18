@@ -1,12 +1,13 @@
-package com.dyingtosurvive.rpccore.protocol;
+package com.dyingtosurvive.rpccore.proxy;
 
-import com.dyingtosurvive.rpccore.common.URL;
+import com.dyingtosurvive.rpccore.common.ZKInfo;
 import com.dyingtosurvive.rpccore.common.ZKNode;
 import com.dyingtosurvive.rpccore.lb.LoadBalance;
 import com.dyingtosurvive.rpccore.register.RegistryConfig;
 import com.dyingtosurvive.rpccore.registry.Registry;
 import com.dyingtosurvive.rpccore.registry.RegistryFactory;
 import com.dyingtosurvive.rpccore.spi.RPCServiceLoader;
+import com.dyingtosurvive.rpccore.trace.ServiceLogger;
 import com.mashape.unirest.http.Unirest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 
-
+/**
+ * rpc:reference动态代理
+ * <p>
+ * created by changesolider on 2018-09-18
+ *
+ * @param <T>
+ */
 public class ServiceProxyHandler<T> implements InvocationHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceProxyHandler.class);
     private static String mapping = "interface org.springframework.web.bind.annotation.RequestMapping";
@@ -30,7 +37,6 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
     private List<RegistryConfig> registryConfigs;
 
     public ServiceProxyHandler(Class<T> clazz, List<RegistryConfig> registryConfigs) {
-        System.out.println("new ServiceProxyHandler :" + System.currentTimeMillis());
         this.clazz = clazz;
         this.registryConfigs = registryConfigs;
     }
@@ -46,7 +52,6 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        System.out.println("objectproxy invode method is called");
         if (Object.class == method.getDeclaringClass()) {
             String name = method.getName();
             if ("equals".equals(name)) {
@@ -61,84 +66,92 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
                 throw new IllegalStateException(String.valueOf(method));
             }
         }
+        //发现服务
+        List<ZKNode> services = discoverService();
+        if (services == null || services.size() == 0) {
+            throw new IllegalStateException("没有找到服务提供者!");
+        }
 
-        List<ZKNode> nodes = getServerInfo();
-        ZKNode choseNode = null;
+        //默认第一个服务
+        ZKNode choseNode = services.get(0);
+        //SPI负载均衡，可选插件
         ServiceLoader<LoadBalance> factories = RPCServiceLoader.load(LoadBalance.class);
         Iterator<LoadBalance> operationIterator = factories.iterator();
         while (operationIterator.hasNext()) {
             LoadBalance operation = operationIterator.next();
-            choseNode = operation.select(nodes);
+            choseNode = operation.select(services);
         }
-        //动态拼装url
-        String url =
-            "http://" + choseNode.getIp() + ":" + choseNode.getPort() + "/" + choseNode.getProjectName();
 
-        System.out.println(method.getDeclaringClass().getName());
-        System.out.println(method.getName());
-        for (int i = 0; i < method.getParameterTypes().length; ++i) {
-            System.out.println(method.getParameterTypes()[i].getName());
-            System.out.println(method.getParameterTypes()[i].getCanonicalName());
-            System.out.println(method.getParameterTypes()[i].getSimpleName());
-            System.out.println(method.getParameterTypes()[i].getTypeName());
+        //组装url
+        String url = assembleRequestUrl(choseNode, method, args);
+        System.out.println("url :" + url);
+        String result = Unirest.get(url).asString().getBody();
+
+        //SPI日志追踪，可选插件
+        ServiceLoader<ServiceLogger> serviceLoggers = RPCServiceLoader.load(ServiceLogger.class);
+        Iterator<ServiceLogger> serviceLoggerIterator = serviceLoggers.iterator();
+        while (serviceLoggerIterator.hasNext()) {
+            ServiceLogger serviceLogger = serviceLoggerIterator.next();
+            serviceLogger.writeLog(url, result);
         }
-        for (int i = 0; i < args.length; ++i) {
-            System.out.println(args[i].toString());
-        }
+        return result;
+    }
+
+
+    private String assembleRequestUrl(ZKNode choseNode, Method method, Object[] args) throws Exception {
+        //动态拼装url
+        String url = "http://" + choseNode.getIp() + ":" + choseNode.getPort() + "/" + choseNode.getProjectName();
+
         String mapurl = "";
         for (Annotation an : method.getAnnotations()) {
             if (an.annotationType().toString().equals(mapping)) {
                 mapurl = mappingGetValue(an);
-                System.out.println(mapurl);
             }
         }
         List<String> params = new ArrayList<>();
         for (Annotation[] annotations : method.getParameterAnnotations()) {
             for (Annotation paramAn : annotations) {
                 if (paramAn.annotationType().toString().equals(requestParam)) {
-                    System.out.println(
-                        paramAn.annotationType().getDeclaredMethod("value", null).invoke(paramAn).toString());
                     params.add(paramAn.annotationType().getDeclaredMethod("value", null).invoke(paramAn).toString());
                 }
             }
         }
         for (int i = 0; i < args.length; ++i) {
-            System.out.println(args[i].toString());
             params.get(i);
             mapurl = mapurl + "?" + params.get(i) + "=" + args[i].toString();
-            System.out.println(mapurl);
         }
         url = url.concat(mapurl);
-        System.out.println("url :" + url);
-        //String retData = Unirest.get(url).queryString("name", name).asJson().getBody().getObject();
-        String result = Unirest.get(url).asString().getBody();
-        return result;
+        return url;
     }
 
-    public List<ZKNode> getServerInfo() {
-        System.out.println("registryConfigs" + registryConfigs.size());
-        String[] registryInfo = registryConfigs.get(0).getAddress().split(":");
-        URL url = new URL();
-        url.setIp("10.42.0.7");
-        url.setPort("2181");
 
-
-        //使用jdk提供的ServiceLoader来做ＳＰＩ设计
+    /**
+     * 发现服务
+     *
+     * @return
+     */
+    private List<ZKNode> discoverService() {
+        //使用ServiceLoader查找注册中心的实现
         ServiceLoader<RegistryFactory> factories = RPCServiceLoader.load(RegistryFactory.class);
         Iterator<RegistryFactory> operationIterator = factories.iterator();
-        while (operationIterator.hasNext()) {
-            RegistryFactory operation = operationIterator.next();
-            Registry registry = operation.getRegistry(url);
-            ZKNode node = new ZKNode();
-            //todo 待从配置文件中得到ip和port和servername
-            System.out.println("interfaceName" + clazz.getName());
-            node.setPackageName("com.dyingtosurvive.rpcinterface.IHelloService");
-            List<ZKNode> nodes = registry.discoverService(node);
-            for (ZKNode node1 : nodes) {
-                System.out.println(node1.getIp());
-            }
-            return nodes;
+        if (!operationIterator.hasNext()) {
+            throw new IllegalStateException("请提供RegistryFactory的实现!");
         }
-        return null;
+        RegistryFactory registryFactory = operationIterator.next();
+        //连接zk
+        Registry registry = registryFactory.getRegistry(getZKInfoFromRegistries());
+        ZKNode node = new ZKNode();
+        node.setPackageName(clazz.getName());
+        //发现服务
+        List<ZKNode> nodes = registry.discoverService(node);
+        return nodes;
+    }
+
+    private ZKInfo getZKInfoFromRegistries() {
+        String[] registryInfo = registryConfigs.get(0).getAddress().split(":");
+        ZKInfo zkInfo = new ZKInfo();
+        zkInfo.setIp(registryInfo[0]);
+        zkInfo.setPort(registryInfo[1]);
+        return zkInfo;
     }
 }
