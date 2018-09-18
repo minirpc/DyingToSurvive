@@ -9,7 +9,6 @@ public class ZKInfo implements Serializable {
     private String ip;
     private String port;
 
-
     public String getIp() {
         return ip;
     }

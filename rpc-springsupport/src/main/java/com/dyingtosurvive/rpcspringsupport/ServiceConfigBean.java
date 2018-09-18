@@ -4,7 +4,7 @@ package com.dyingtosurvive.rpcspringsupport;
 import com.dyingtosurvive.rpccore.common.ApplicationConfig;
 import com.dyingtosurvive.rpccore.common.ZKInfo;
 import com.dyingtosurvive.rpccore.common.ZKNode;
-import com.dyingtosurvive.rpccore.register.RegistryConfig;
+import com.dyingtosurvive.rpccore.registry.RegistryConfig;
 import com.dyingtosurvive.rpccore.registry.Registry;
 import com.dyingtosurvive.rpccore.registry.RegistryFactory;
 import com.dyingtosurvive.rpccore.spi.RPCServiceLoader;

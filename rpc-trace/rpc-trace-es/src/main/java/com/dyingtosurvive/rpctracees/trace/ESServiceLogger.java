@@ -1,6 +1,8 @@
 package com.dyingtosurvive.rpctracees.trace;
 
+import com.dyingtosurvive.rpccore.common.TraceLog;
 import com.dyingtosurvive.rpccore.trace.ServiceLogger;
+import org.json.JSONObject;
 
 /**
  * 日志追踪插件
@@ -8,8 +10,8 @@ import com.dyingtosurvive.rpccore.trace.ServiceLogger;
  */
 public class ESServiceLogger implements ServiceLogger {
     @Override
-    public void writeLog(Object request, Object response) {
-
+    public void writeLog(TraceLog traceLog) {
+        System.out.println("tracelog:" + traceLog.toString());
     }
 
     @Override

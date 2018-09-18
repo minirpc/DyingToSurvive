@@ -2,7 +2,7 @@ package com.dyingtosurvive.rpcspringsupport;
 
 
 import com.dyingtosurvive.rpccore.common.ApplicationConfig;
-import com.dyingtosurvive.rpccore.register.RegistryConfig;
+import com.dyingtosurvive.rpccore.registry.RegistryConfig;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 import java.util.HashSet;

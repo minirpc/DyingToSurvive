@@ -1,4 +1,4 @@
-package com.dyingtosurvive.rpccore.register;
+package com.dyingtosurvive.rpccore.registry;
 
 /**
  * Created by change-solider on 18-9-6.

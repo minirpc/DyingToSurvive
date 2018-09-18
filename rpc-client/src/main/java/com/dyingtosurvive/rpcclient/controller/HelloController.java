@@ -16,8 +16,6 @@ public class HelloController {
 
     @RequestMapping(value = "/hello")
     public String helloDyingToService(@RequestParam(value = "helloMessage") String helloMessage) {
-       /* IHelloService helloService = serviceCreateHelper.buildService(IHelloService.class);
-        return helloService.helloDyingToService(helloMessage);*/
         return helloService.helloDyingToService(helloMessage);
     }
 }

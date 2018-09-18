@@ -2,10 +2,9 @@ package com.dyingtosurvive.rpcspringsupport;
 
 
 import com.dyingtosurvive.rpccore.common.ApplicationConfig;
-import com.dyingtosurvive.rpccore.register.RegistryConfig;
+import com.dyingtosurvive.rpccore.registry.RegistryConfig;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
-import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;

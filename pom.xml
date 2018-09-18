@@ -15,13 +15,13 @@
     <module>rpc-core</module>
     <module>rpc-loadbalance</module>
     <module>rpc-interface</module>
+    <module>rpc-trace</module>
     <module>rpc-client</module>
     <module>rpc-server</module>
     <module>rpc-registry</module>
     <module>rpc-springsupport</module>
     <module>rpc-monitor</module>
     <module>rpc-config</module>
-    <module>rpc-trace</module>
   </modules>
 
   <properties>

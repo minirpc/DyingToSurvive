@@ -1,7 +1,7 @@
 package com.dyingtosurvive.rpccore.proxy;
 
 
-import com.dyingtosurvive.rpccore.register.RegistryConfig;
+import com.dyingtosurvive.rpccore.registry.RegistryConfig;
 
 import java.lang.reflect.Proxy;
 import java.util.List;

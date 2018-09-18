@@ -1,13 +1,15 @@
 package com.dyingtosurvive.rpccore.proxy;
 
+import com.dyingtosurvive.rpccore.common.TraceLog;
 import com.dyingtosurvive.rpccore.common.ZKInfo;
 import com.dyingtosurvive.rpccore.common.ZKNode;
 import com.dyingtosurvive.rpccore.lb.LoadBalance;
-import com.dyingtosurvive.rpccore.register.RegistryConfig;
+import com.dyingtosurvive.rpccore.registry.RegistryConfig;
 import com.dyingtosurvive.rpccore.registry.Registry;
 import com.dyingtosurvive.rpccore.registry.RegistryFactory;
 import com.dyingtosurvive.rpccore.spi.RPCServiceLoader;
 import com.dyingtosurvive.rpccore.trace.ServiceLogger;
+import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +18,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.UUID;
 
 /**
  * rpc:reference动态代理
@@ -81,20 +85,38 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
             LoadBalance operation = operationIterator.next();
             choseNode = operation.select(services);
         }
-
         //组装url
         String url = assembleRequestUrl(choseNode, method, args);
         System.out.println("url :" + url);
-        String result = Unirest.get(url).asString().getBody();
+        //发送http请求
+        HttpResponse<String> response = Unirest.get(url).asString();
+        String result = response.getBody();
 
+        //trace处理
+        handleTrace(url, response, result);
+        return result;
+    }
+
+    private void handleTrace(String url, HttpResponse<String> response, String result) {
         //SPI日志追踪，可选插件
         ServiceLoader<ServiceLogger> serviceLoggers = RPCServiceLoader.load(ServiceLogger.class);
         Iterator<ServiceLogger> serviceLoggerIterator = serviceLoggers.iterator();
-        while (serviceLoggerIterator.hasNext()) {
-            ServiceLogger serviceLogger = serviceLoggerIterator.next();
-            serviceLogger.writeLog(url, result);
+        if (!serviceLoggerIterator.hasNext()) {
+            return;
         }
-        return result;
+        ServiceLogger serviceLogger = serviceLoggerIterator.next();
+        TraceLog traceLog = new TraceLog();
+        traceLog.setFromProject("rpcclient");
+        traceLog.setRequestUrl(url);
+        traceLog.setToProject("rpcserver");
+        traceLog.setRequestTimestamp(new Date());
+        traceLog.setResponseTimestamp(new Date());
+        traceLog.setRequestDuration(traceLog.getResponseTimestamp().getTime() - traceLog.getRequestTimestamp().getTime());
+        traceLog.setRequestId(UUID.randomUUID().toString());
+        traceLog.setTraceId(UUID.randomUUID().toString());
+        traceLog.setResponseCode(response.getStatusText());
+        traceLog.setResponseBody(result);
+        serviceLogger.writeLog(traceLog);
     }
 
 
@@ -150,8 +172,10 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
     private ZKInfo getZKInfoFromRegistries() {
         String[] registryInfo = registryConfigs.get(0).getAddress().split(":");
         ZKInfo zkInfo = new ZKInfo();
-        zkInfo.setIp(registryInfo[0]);
-        zkInfo.setPort(registryInfo[1]);
+        //zkInfo.setIp(registryInfo[0]);
+        zkInfo.setIp("10.42.0.7");
+        //zkInfo.setPort(registryInfo[1]);
+        zkInfo.setPort("2181");
         return zkInfo;
     }
 }

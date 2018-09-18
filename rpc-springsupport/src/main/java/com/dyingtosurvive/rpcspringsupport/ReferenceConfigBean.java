@@ -2,7 +2,7 @@ package com.dyingtosurvive.rpcspringsupport;
 
 
 import com.dyingtosurvive.rpccore.proxy.ServiceCreateHelper;
-import com.dyingtosurvive.rpccore.register.RegistryConfig;
+import com.dyingtosurvive.rpccore.registry.RegistryConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
