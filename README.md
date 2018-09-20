@@ -4,13 +4,12 @@ java实现的最小的使用http方式的rpc框架
 
 ###　项目结构
 
-rpc-client : 接口调用方
+rpc-demo
+    rpc-interface : rpc-client与rpc-server依赖此包，用于定义接口	
+    rpc-client : 接口调用方
+    rpc-server :  接口提供方，需要实现rpc-interface中的接口
 
 rpc-core	:　核心代码，动态代理＋反射＋http请求
-
-rpc-interface : rpc-client与rpc-server依赖此包，用于定义接口	
-
-rpc-server :  接口提供方，需要实现rpc-interface中的接口
 
 rpc-registry: 服务注册中心
 
@@ -23,6 +22,9 @@ rpc-loadbalance:自定义负载均衡器
 rpc-config:配置中心jar包，rpc-monitor依赖配置中心
 
 rpc-trace:rpc调用跟踪，调用值
+
+
+
 
 ### 开发记录
 rpc-server　负责注册服务　(服务名：项目名，接口地址，参数)
@@ -79,20 +81,33 @@ productservice中有服务（产品列表，产品操作）
 7.增加调用日志的处理用于rpc-monitor使用
 8.增加权重，监测中心
 9.rpc-monitor是一个web项目,用于提供管理权重，查看服务流量，查看调用链
-10.rpc-config功能:配置服务权重　
-11.rpc-trace-es:封装调用日志，提供查询接口,
+依赖项目：rpc-config,rpc-trace-es,
 
+10.rpc-config功能:基于mysql配置服务权重,redis进行缓存　
+
+11.rpc-trace-es:封装调用日志，提供查询接口,
 
 
 ### rpc　在ZK中的节点注册　
 |-dyingtosurvive
 |-------------rpc
-|----------------com.dyingtosurvive.rpcinterface.IHelloService
+|----------------com.dyingtosurvive.rpcinterface.service.IHelloService
 |--------------------------------------------------------------providers
 |-----------------------------------------------------------------------[127.0.0.1:8080] 临时节点，可多个
 
 
 
+### 此项目关键技术　
+- jdk 动态代理　
+- spring标签定义　
+- java spi设计
+- zk操作
+- es操作(日志)
+- lb算法
+- redis操作
+- rocketmq操作
+- 日志切面，将日志放入到rpc-trace-es中,使用rocketmq进行消息发送，减少对业务的侵入
+- threadlocal追踪header信息
 
 
 

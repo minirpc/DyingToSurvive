@@ -1,9 +1,7 @@
 package com.dyingtosurvive.rpcserver.service;
 
-import com.dyingtosurvive.rpcinterface.IHelloService;
+import com.dyingtosurvive.rpcinterface.service.IHelloService;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Created by change-solider on 18-9-6.
