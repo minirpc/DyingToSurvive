@@ -1,7 +1,7 @@
 package com.dyingtosurvive.rpccore.registry;
 
 
-import com.dyingtosurvive.rpccore.common.ZKNode;
+import com.dyingtosurvive.rpcinterface.model.ZKNode;
 
 import java.util.List;
 

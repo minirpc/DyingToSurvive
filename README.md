@@ -15,13 +15,22 @@ rpc-registry: 服务注册中心
 
 rpc-springsupport: spring支持
 
-rpc-monitor:管理中心,对外提供api接口
+rpc-monitor:监测中心,对外提供服务（服务监控）
 
 rpc-loadbalance:自定义负载均衡器
 
-rpc-config:配置中心jar包，rpc-monitor依赖配置中心
+rpc-config:配置中心jar包，对外提供服务（服务权重）
 
-rpc-trace:rpc调用跟踪，调用值
+rpc-trace:rpc调用跟踪，调用值,对外提供服务（服务追踪）　
+
+rpc-manager:统一的管理平台　（治理平台）
+依赖于项目:rpc-monitor,rpc-config,rpc-trace
+
+
+### rpc-monitor与rpc-trace功能的定位:
+- rpc-monitor是监控中心，如500,400,CPU,内存指标
+- rpc-trace是追踪系统，提供调用链，
+
 
 
 
@@ -37,6 +46,8 @@ rpc-client　负责使用服务：
 4.拼装请求url(项目名有了，接口地址也有了，参数也有了，)
 5.发送请求
 6.当动态代理访问时，先调用出registry,再由registry找出支持此服务的url然后再调用　
+7.http 支持post请求
+8.rpc-config包引入，可以根据rpcconfig中
 
 
 ### 实现效果　
@@ -80,12 +91,12 @@ productservice中有服务（产品列表，产品操作）
 6.增加调用的回调设计　
 7.增加调用日志的处理用于rpc-monitor使用
 8.增加权重，监测中心
-9.rpc-monitor是一个web项目,用于提供管理权重，查看服务流量，查看调用链
-依赖项目：rpc-config,rpc-trace-es,
-
-10.rpc-config功能:基于mysql配置服务权重,redis进行缓存　
-
+9.rpc-monitor：监测中心,性能,主要用于采集性能
+10.rpc-config功能:基于mysql配置服务权重,redis进行缓存　,服务鉴权配置,服务限流配置
 11.rpc-trace-es:封装调用日志，提供查询接口,
+12.引入本地缓存，当注册中心不可用或注册中心地址不可用时，使用本地缓存的服务地址
+13.rpc-manager是一个web项目,用于提供管理权重，查看服务流量，查看调用链,查看监控
+
 
 
 ### rpc　在ZK中的节点注册　
@@ -108,6 +119,38 @@ productservice中有服务（产品列表，产品操作）
 - rocketmq操作
 - 日志切面，将日志放入到rpc-trace-es中,使用rocketmq进行消息发送，减少对业务的侵入
 - threadlocal追踪header信息
+- guavacache或springcache
+
+### 计划引入技术　
+- netty
+- nginx
+websocket
+
+
+### 一些想法
+RAW日志异步输出到队列,交由netty进行处理，netty收到后，使用websocket同步到web界面　
+
+多级缓存:springcache,google guavacache, nginx+lua访问rediscache
+
+秒杀场景:
+
+服务降级:服务端降级,rpc-core包
+
+服务限流
+
+服务鉴权：进行服务调用鉴权
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

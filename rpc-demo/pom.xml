@@ -16,7 +16,7 @@
     <url>http://www.example.com</url>
 
     <modules>
-        <module>rpc-interface</module>
+        <module>rpc-demo-interface</module>
         <module>rpc-client</module>
         <module>rpc-server</module>
     </modules>

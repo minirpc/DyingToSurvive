@@ -1,18 +1,23 @@
 package com.dyingtosurvive.rpccore.proxy;
 
+import com.alibaba.fastjson.JSONObject;
+import com.dyingtosurvive.rpccore.common.RPCHttpRequest;
 import com.dyingtosurvive.rpccore.common.TraceLog;
 import com.dyingtosurvive.rpccore.common.ZKInfo;
-import com.dyingtosurvive.rpccore.common.ZKNode;
+import com.dyingtosurvive.rpcinterface.model.GetCanUseServiceRequest;
+import com.dyingtosurvive.rpcinterface.model.ZKNode;
 import com.dyingtosurvive.rpccore.lb.LoadBalance;
 import com.dyingtosurvive.rpccore.registry.RegistryConfig;
 import com.dyingtosurvive.rpccore.registry.Registry;
 import com.dyingtosurvive.rpccore.registry.RegistryFactory;
 import com.dyingtosurvive.rpccore.spi.RPCServiceLoader;
 import com.dyingtosurvive.rpccore.trace.ServiceLogger;
+import com.dyingtosurvive.rpcinterface.service.IWeightService;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
@@ -54,6 +59,15 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
         }
     }
 
+    public static String mappingGetHttpMethod(Annotation an) throws Exception {
+        RequestMethod[] methods = (RequestMethod[]) an.annotationType().getDeclaredMethod("method", null).invoke(an);
+        if (methods == null || methods.length == 0) {
+            return "GET";
+        }
+        return methods[0].name();
+    }
+
+
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (Object.class == method.getDeclaringClass()) {
@@ -70,12 +84,70 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
                 throw new IllegalStateException(String.valueOf(method));
             }
         }
-        //发现服务
-        List<ZKNode> services = discoverService();
+        return handleRequest(method, args);
+    }
+
+
+    private Object handleRequest(Method method, Object[] args) throws Exception {
+        //1.发现可用服务
+       /* List<ZKNode> services = discoverService();
         if (services == null || services.size() == 0) {
             throw new IllegalStateException("没有找到服务提供者!");
         }
 
+        //2.调用配置中心，得到权重比对后的服务列表,此处需要防止循环调用
+        IWeightService calcWeightService = null;
+        if (!clazz.equals(IWeightService.class)) {
+            //调用配置服务得到服务权重等信息
+            calcWeightService = ServiceCreateHelper.buildService(IWeightService.class, registryConfigs);
+            GetCanUseServiceRequest request = new GetCanUseServiceRequest();
+            request.setServiceName(clazz.getName());
+            request.setServices(services);
+            List<ZKNode> shouldUseService = calcWeightService.getCanUseService(request);
+            System.out.println("shouldUseService size : " + shouldUseService.size());
+            if (shouldUseService != null && shouldUseService.size() > 0) {
+                //经过配置中心挑选出的服务才是lb可负载的范围
+                services = shouldUseService;
+            }
+        }
+
+        //3.负载均衡选择服务
+        ZKNode choseNode = choseNodeFromLoadBalance(services);*/
+
+        //4.处理http请求
+        //Object resutl = handHttpRequest(choseNode, method, args);
+        Object resutl = handHttpRequest(null, method, args);
+
+        //5.如果有配置中心，则写入权重信息
+       /* if (calcWeightService != null) {
+            calcWeightService.writeWeightInfo(choseNode);
+        }*/
+        return resutl;
+    }
+
+    private Object handHttpRequest(ZKNode choseNode, Method method, Object[] args) throws Exception {
+        //组装url
+        RPCHttpRequest request = generateRPCHttpRequest(choseNode, method, args);
+        System.out.println("url :" + request.getUrl());
+        //发送http请求
+
+        HttpResponse<String> response = null;
+        if ("GET".equals(request.getMethod())) {
+            response = Unirest.get(request.getUrl()).asString();
+        } else if ("POST".equals(request.getMethod())) {
+            response = Unirest.post(request.getUrl()).header("Content-Type","application/json").body(
+                JSONObject.toJSONString(request.getBody())).asString();
+        }
+        System.out.println("methodreturntype:" + method.getReturnType());
+        Object object = JSONObject.parseObject(response.getBody(), method.getReturnType());
+        //trace处理
+        //handleTrace(request.getUrl(), response, object);
+        return object;
+    }
+
+
+
+    private ZKNode choseNodeFromLoadBalance(List<ZKNode> services) {
         //默认第一个服务
         ZKNode choseNode = services.get(0);
         //SPI负载均衡，可选插件
@@ -85,19 +157,10 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
             LoadBalance operation = operationIterator.next();
             choseNode = operation.select(services);
         }
-        //组装url
-        String url = assembleRequestUrl(choseNode, method, args);
-        System.out.println("url :" + url);
-        //发送http请求
-        HttpResponse<String> response = Unirest.get(url).asString();
-        String result = response.getBody();
-
-        //trace处理
-        handleTrace(url, response, result);
-        return result;
+        return choseNode;
     }
 
-    private void handleTrace(String url, HttpResponse<String> response, String result) {
+    private void handleTrace(String url, HttpResponse<String> response, Object result) {
         //SPI日志追踪，可选插件
         ServiceLoader<ServiceLogger> serviceLoggers = RPCServiceLoader.load(ServiceLogger.class);
         Iterator<ServiceLogger> serviceLoggerIterator = serviceLoggers.iterator();
@@ -111,7 +174,8 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
         traceLog.setToProject("rpcserver");
         traceLog.setRequestTimestamp(new Date());
         traceLog.setResponseTimestamp(new Date());
-        traceLog.setRequestDuration(traceLog.getResponseTimestamp().getTime() - traceLog.getRequestTimestamp().getTime());
+        traceLog
+            .setRequestDuration(traceLog.getResponseTimestamp().getTime() - traceLog.getRequestTimestamp().getTime());
         traceLog.setRequestId(UUID.randomUUID().toString());
         traceLog.setTraceId(UUID.randomUUID().toString());
         traceLog.setResponseCode(response.getStatusText());
@@ -120,9 +184,11 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
     }
 
 
-    private String assembleRequestUrl(ZKNode choseNode, Method method, Object[] args) throws Exception {
+    private RPCHttpRequest generateRPCHttpRequest(ZKNode choseNode, Method method, Object[] args) throws Exception {
+        RPCHttpRequest httpRequest = new RPCHttpRequest();
         //动态拼装url
-        String url = "http://" + choseNode.getIp() + ":" + choseNode.getPort() + "/" + choseNode.getProjectName();
+        //String url = "http://" + choseNode.getIp() + ":" + choseNode.getPort() + "/" + choseNode.getProjectName();
+        String url = "http://127.0.0.1:8080/rpcserver/";
 
         String mapurl = "";
         for (Annotation an : method.getAnnotations()) {
@@ -130,20 +196,39 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
                 mapurl = mappingGetValue(an);
             }
         }
-        List<String> params = new ArrayList<>();
-        for (Annotation[] annotations : method.getParameterAnnotations()) {
-            for (Annotation paramAn : annotations) {
-                if (paramAn.annotationType().toString().equals(requestParam)) {
-                    params.add(paramAn.annotationType().getDeclaredMethod("value", null).invoke(paramAn).toString());
-                }
+        String httpMethod = "";
+        for (Annotation an : method.getAnnotations()) {
+            if (an.annotationType().toString().equals(mapping)) {
+                httpMethod = mappingGetHttpMethod(an);
+                break;
             }
         }
-        for (int i = 0; i < args.length; ++i) {
-            params.get(i);
-            mapurl = mapurl + "?" + params.get(i) + "=" + args[i].toString();
+        System.out.println("httpmethod:" + httpMethod);
+        if ("GET".equals(httpMethod)) {
+            List<String> params = new ArrayList<>();
+            for (Annotation[] annotations : method.getParameterAnnotations()) {
+                for (Annotation paramAn : annotations) {
+                    if (paramAn.annotationType().toString().equals(requestParam)) {
+                        params
+                            .add(paramAn.annotationType().getDeclaredMethod("value", null).invoke(paramAn).toString());
+                    }
+                }
+            }
+            for (int i = 0; i < args.length; ++i) {
+                params.get(i);
+                mapurl = mapurl + "?" + params.get(i) + "=" + args[i].toString();
+            }
+            url = url.concat(mapurl);
+        }else {
+            url = url.concat(mapurl);
         }
-        url = url.concat(mapurl);
-        return url;
+
+        httpRequest.setMethod(httpMethod);
+        if ("POST".equals(httpMethod) && args.length == 1) {
+            httpRequest.setBody(args[0]);
+        }
+        httpRequest.setUrl(url);
+        return httpRequest;
     }
 
 

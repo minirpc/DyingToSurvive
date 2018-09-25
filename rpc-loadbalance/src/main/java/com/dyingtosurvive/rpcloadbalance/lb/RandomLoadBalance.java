@@ -1,6 +1,6 @@
 package com.dyingtosurvive.rpcloadbalance.lb;
 
-import com.dyingtosurvive.rpccore.common.ZKNode;
+import com.dyingtosurvive.rpcinterface.model.ZKNode;
 import com.dyingtosurvive.rpccore.lb.LoadBalance;
 
 import java.util.List;

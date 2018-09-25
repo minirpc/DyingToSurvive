@@ -1,6 +1,6 @@
 package com.dyingtosurvive.rpcregistryzk;
 
-import com.dyingtosurvive.rpccore.common.ZKNode;
+import com.dyingtosurvive.rpcinterface.model.ZKNode;
 
 /**
  * Created by change-solider on 2018-9-8.

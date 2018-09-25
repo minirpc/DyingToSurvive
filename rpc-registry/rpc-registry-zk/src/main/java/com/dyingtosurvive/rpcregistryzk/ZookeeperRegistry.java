@@ -3,7 +3,7 @@ package com.dyingtosurvive.rpcregistryzk;
 
 
 import com.dyingtosurvive.rpccore.common.ZKInfo;
-import com.dyingtosurvive.rpccore.common.ZKNode;
+import com.dyingtosurvive.rpcinterface.model.ZKNode;
 import com.dyingtosurvive.rpccore.registry.Registry;
 import org.I0Itec.zkclient.ZkClient;
 

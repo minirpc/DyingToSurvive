@@ -1,6 +1,6 @@
 package com.dyingtosurvive.rpcserver.service;
 
-import com.dyingtosurvive.rpcinterface.service.IHelloService;
+import com.dyingtosurvive.rpcdemointerface.service.IHelloService;
 import org.springframework.stereotype.Service;
 
 /**
