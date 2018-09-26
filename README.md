@@ -26,6 +26,7 @@ rpc-trace:rpc调用跟踪，调用值,对外提供服务（服务追踪）　
 rpc-manager:统一的管理平台　（治理平台）
 依赖于项目:rpc-monitor,rpc-config,rpc-trace
 
+rpc-gateway:服务网关
 
 ### rpc-monitor与rpc-trace功能的定位:
 - rpc-monitor是监控中心，如500,400,CPU,内存指标
@@ -95,7 +96,7 @@ productservice中有服务（产品列表，产品操作）
 10.rpc-config功能:基于mysql配置服务权重,redis进行缓存　,服务鉴权配置,服务限流配置
 11.rpc-trace-es:封装调用日志，提供查询接口,
 12.引入本地缓存，当注册中心不可用或注册中心地址不可用时，使用本地缓存的服务地址
-13.rpc-manager是一个web项目,用于提供管理权重，查看服务流量，查看调用链,查看监控
+13.rpc-manager是一个web项目,用于提供管理权重，查看服务流量，查看调用链,查看监控,
 
 
 
@@ -139,6 +140,38 @@ RAW日志异步输出到队列,交由netty进行处理，netty收到后，使用
 服务限流
 
 服务鉴权：进行服务调用鉴权
+
+服务网关引入:
+第一类网关:聚合网关，完成数据聚合操作,类似于中台项目
+第二类网关:应用网关
+
+
+
+### 服务网关
+第一步：
+增加项目
+rpc-gateway
+
+路由:应用名称
+
+使用rpc-config保存网关配置信息,如
+/user : rpc-user
+
+第二步:
+openresty 对接rpc-gateway
+
+rpc-gateway为web项目
+
+鉴权需要分类
+API接口的访问权限控制
+用户鉴权
+
+
+此项目需要引入API接口的访问权限控制,
+
+
+
+
 
 
 

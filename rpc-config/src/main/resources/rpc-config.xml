@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:rpc="http://code.dyingtosurvive.com/schema/rpc"
+       xsi:schemaLocation="
+   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+   http://code.dyingtosurvive.com/schema/rpc http://code.dyingtosurvive.com/schema/rpc/rpc.xsd
+   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <context:annotation-config/>
+
+    <context:component-scan base-package="com.dyingtosurvive.rpcconfig"/>
+
+    <context:property-placeholder location="classpath:application.properties"/>
+
+    <rpc:application name="${application.name}" ip="${server.ip}" port="${server.port}" rootPath="${server.servlet.context-path}"/>
+
+    <rpc:registry protocol="zookeeper" address="${registry.address}"/>
+
+    <rpc:service interface="com.dyingtosurvive.rpcinterface.service.IWeightService" ref="weightService"/>
+
+    <rpc:service interface="com.dyingtosurvive.rpcinterface.service.IRouterService" ref="routerService"/>
+
+</beans>

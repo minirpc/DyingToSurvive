@@ -90,7 +90,7 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
 
     private Object handleRequest(Method method, Object[] args) throws Exception {
         //1.发现可用服务
-       /* List<ZKNode> services = discoverService();
+        List<ZKNode> services = discoverService();
         if (services == null || services.size() == 0) {
             throw new IllegalStateException("没有找到服务提供者!");
         }
@@ -112,16 +112,15 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
         }
 
         //3.负载均衡选择服务
-        ZKNode choseNode = choseNodeFromLoadBalance(services);*/
+        ZKNode choseNode = choseNodeFromLoadBalance(services);
 
         //4.处理http请求
-        //Object resutl = handHttpRequest(choseNode, method, args);
-        Object resutl = handHttpRequest(null, method, args);
+        Object resutl = handHttpRequest(choseNode, method, args);
 
         //5.如果有配置中心，则写入权重信息
-       /* if (calcWeightService != null) {
+        if (calcWeightService != null) {
             calcWeightService.writeWeightInfo(choseNode);
-        }*/
+        }
         return resutl;
     }
 
@@ -135,13 +134,13 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
         if ("GET".equals(request.getMethod())) {
             response = Unirest.get(request.getUrl()).asString();
         } else if ("POST".equals(request.getMethod())) {
-            response = Unirest.post(request.getUrl()).header("Content-Type","application/json").body(
+            response = Unirest.post(request.getUrl()).header("Content-Type", "application/json").body(
                 JSONObject.toJSONString(request.getBody())).asString();
         }
         System.out.println("methodreturntype:" + method.getReturnType());
         Object object = JSONObject.parseObject(response.getBody(), method.getReturnType());
         //trace处理
-        //handleTrace(request.getUrl(), response, object);
+        handleTrace(request.getUrl(), response, object);
         return object;
     }
 
@@ -187,8 +186,7 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
     private RPCHttpRequest generateRPCHttpRequest(ZKNode choseNode, Method method, Object[] args) throws Exception {
         RPCHttpRequest httpRequest = new RPCHttpRequest();
         //动态拼装url
-        //String url = "http://" + choseNode.getIp() + ":" + choseNode.getPort() + "/" + choseNode.getProjectName();
-        String url = "http://127.0.0.1:8080/rpcserver/";
+        String url = "http://" + choseNode.getIp() + ":" + choseNode.getPort() + "/" + choseNode.getProjectName();
 
         String mapurl = "";
         for (Annotation an : method.getAnnotations()) {
@@ -219,7 +217,7 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
                 mapurl = mapurl + "?" + params.get(i) + "=" + args[i].toString();
             }
             url = url.concat(mapurl);
-        }else {
+        } else {
             url = url.concat(mapurl);
         }
 
@@ -257,9 +255,9 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
     private ZKInfo getZKInfoFromRegistries() {
         String[] registryInfo = registryConfigs.get(0).getAddress().split(":");
         ZKInfo zkInfo = new ZKInfo();
-        //zkInfo.setIp(registryInfo[0]);
+        //todo zkInfo.setIp(registryInfo[0]);
         zkInfo.setIp("10.42.0.7");
-        //zkInfo.setPort(registryInfo[1]);
+        //todo zkInfo.setPort(registryInfo[1]);
         zkInfo.setPort("2181");
         return zkInfo;
     }

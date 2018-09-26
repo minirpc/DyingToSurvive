@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
+ *
+ * 权重管理
  * Created by change-solider on 2018-8-23.
  */
 @RestController

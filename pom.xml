@@ -22,6 +22,7 @@
     <module>rpc-manager</module>
     <module>rpc-interface</module>
     <module>rpc-config</module>
+    <module>rpc-gateway</module>
   </modules>
 
   <properties>

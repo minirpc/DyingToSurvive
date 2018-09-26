@@ -1,4 +1,6 @@
 com/dyingtosurvive/rpcinterface/model/ServiceType.class
+com/dyingtosurvive/rpcinterface/service/IRouterService.class
 com/dyingtosurvive/rpcinterface/model/ZKNode.class
+com/dyingtosurvive/rpcinterface/model/Router.class
 com/dyingtosurvive/rpcinterface/model/GetCanUseServiceRequest.class
 com/dyingtosurvive/rpcinterface/service/IWeightService.class
