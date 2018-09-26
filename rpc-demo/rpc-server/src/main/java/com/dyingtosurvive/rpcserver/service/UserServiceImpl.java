@@ -21,7 +21,7 @@ public class UserServiceImpl implements IUserService {
 
 
     @Override
-    public User saveUser(@RequestBody User user) {
+    public User saveUser(User user) {
         System.out.println("saveUser:" + JSONObject.toJSONString(user));
         return user;
     }

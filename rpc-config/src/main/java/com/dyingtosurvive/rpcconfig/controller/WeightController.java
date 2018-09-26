@@ -1,5 +1,6 @@
 package com.dyingtosurvive.rpcconfig.controller;
 
+import com.dyingtosurvive.rpcinterface.model.GetAvailableServiceResponse;
 import com.dyingtosurvive.rpcinterface.model.GetCanUseServiceRequest;
 import com.dyingtosurvive.rpcinterface.model.ServiceType;
 import com.dyingtosurvive.rpcinterface.model.ZKNode;
@@ -29,7 +30,7 @@ public class WeightController {
     }
 
     @RequestMapping(value = "/service/canuseservice", method = RequestMethod.POST)
-    public List<ZKNode> getCanUseService(@RequestBody GetCanUseServiceRequest request) {
+    public GetAvailableServiceResponse getCanUseService(@RequestBody GetCanUseServiceRequest request) {
         return weightService.getCanUseService(request);
     }
 }

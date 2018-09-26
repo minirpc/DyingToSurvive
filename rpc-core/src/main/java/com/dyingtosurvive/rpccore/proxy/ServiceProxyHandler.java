@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.dyingtosurvive.rpccore.common.RPCHttpRequest;
 import com.dyingtosurvive.rpccore.common.TraceLog;
 import com.dyingtosurvive.rpccore.common.ZKInfo;
+import com.dyingtosurvive.rpcinterface.model.GetAvailableServiceResponse;
 import com.dyingtosurvive.rpcinterface.model.GetCanUseServiceRequest;
 import com.dyingtosurvive.rpcinterface.model.ZKNode;
 import com.dyingtosurvive.rpccore.lb.LoadBalance;
@@ -37,7 +38,7 @@ import java.util.UUID;
  * @param <T>
  */
 public class ServiceProxyHandler<T> implements InvocationHandler {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceProxyHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(ServiceProxyHandler.class);
     private static String mapping = "interface org.springframework.web.bind.annotation.RequestMapping";
     private static String requestParam = "interface org.springframework.web.bind.annotation.RequestParam";
     private static String pathVariable = "interface org.springframework.web.bind.annotation.PathVariable";
@@ -87,7 +88,6 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
         return handleRequest(method, args);
     }
 
-
     private Object handleRequest(Method method, Object[] args) throws Exception {
         //1.发现可用服务
         List<ZKNode> services = discoverService();
@@ -103,11 +103,19 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
             GetCanUseServiceRequest request = new GetCanUseServiceRequest();
             request.setServiceName(clazz.getName());
             request.setServices(services);
-            List<ZKNode> shouldUseService = calcWeightService.getCanUseService(request);
-            System.out.println("shouldUseService size : " + shouldUseService.size());
-            if (shouldUseService != null && shouldUseService.size() > 0) {
-                //经过配置中心挑选出的服务才是lb可负载的范围
-                services = shouldUseService;
+            try {
+                GetAvailableServiceResponse response = calcWeightService.getCanUseService(request);
+                if (response != null) {
+                    List<ZKNode> shouldUseService = response.getAvailableServices();
+                    if (shouldUseService != null && shouldUseService.size() > 0) {
+                        //经过配置中心挑选出的服务才是lb可负载的范围
+                        services = shouldUseService;
+                        System.out.println("shouldUseService size : " + shouldUseService.size());
+                    }
+                }
+
+            } catch (Exception e) {
+                logger.error("未提供配置中心实现，无法使用配置中心做服务权重负载!");
             }
         }
 
@@ -119,7 +127,11 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
 
         //5.如果有配置中心，则写入权重信息
         if (calcWeightService != null) {
-            calcWeightService.writeWeightInfo(choseNode);
+            try {
+                calcWeightService.writeWeightInfo(choseNode);
+            } catch (Exception e) {
+                logger.error("未提供配置中心实现，无法使用配置中心写入服务调用情况!");
+            }
         }
         return resutl;
     }
@@ -139,6 +151,7 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
         }
         System.out.println("methodreturntype:" + method.getReturnType());
         Object object = JSONObject.parseObject(response.getBody(), method.getReturnType());
+
         //trace处理
         handleTrace(request.getUrl(), response, object);
         return object;

@@ -2,5 +2,6 @@
 /home/change-solider/workspaces/ownProjects/DyingToSurvive/rpc-interface/src/main/java/com/dyingtosurvive/rpcinterface/model/ZKNode.java
 /home/change-solider/workspaces/ownProjects/DyingToSurvive/rpc-interface/src/main/java/com/dyingtosurvive/rpcinterface/service/IWeightService.java
 /home/change-solider/workspaces/ownProjects/DyingToSurvive/rpc-interface/src/main/java/com/dyingtosurvive/rpcinterface/model/Router.java
+/home/change-solider/workspaces/ownProjects/DyingToSurvive/rpc-interface/src/main/java/com/dyingtosurvive/rpcinterface/model/GetAvailableServiceResponse.java
 /home/change-solider/workspaces/ownProjects/DyingToSurvive/rpc-interface/src/main/java/com/dyingtosurvive/rpcinterface/model/ServiceType.java
 /home/change-solider/workspaces/ownProjects/DyingToSurvive/rpc-interface/src/main/java/com/dyingtosurvive/rpcinterface/model/GetCanUseServiceRequest.java

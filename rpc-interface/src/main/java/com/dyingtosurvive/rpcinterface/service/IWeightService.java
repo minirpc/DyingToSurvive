@@ -1,5 +1,6 @@
 package com.dyingtosurvive.rpcinterface.service;
 
+import com.dyingtosurvive.rpcinterface.model.GetAvailableServiceResponse;
 import com.dyingtosurvive.rpcinterface.model.GetCanUseServiceRequest;
 import com.dyingtosurvive.rpcinterface.model.ServiceType;
 import com.dyingtosurvive.rpcinterface.model.ZKNode;
@@ -20,7 +21,7 @@ public interface IWeightService {
     List<ServiceType> getAllServices();
 
     @RequestMapping(value = "/service/canuseservice",method = RequestMethod.POST)
-    List<ZKNode> getCanUseService(@RequestBody GetCanUseServiceRequest request);
+    GetAvailableServiceResponse getCanUseService(@RequestBody GetCanUseServiceRequest request);
 
     void writeWeightInfo(ZKNode choseNode);
 }

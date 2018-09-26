@@ -1,6 +1,7 @@
 package com.dyingtosurvive.rpcconfig.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.dyingtosurvive.rpcinterface.model.GetAvailableServiceResponse;
 import com.dyingtosurvive.rpcinterface.model.GetCanUseServiceRequest;
 import com.dyingtosurvive.rpcinterface.model.ServiceType;
 import com.dyingtosurvive.rpcinterface.model.ZKNode;
@@ -30,8 +31,10 @@ public class WeightServiceImpl implements IWeightService {
     }
 
     @Override
-    public List<ZKNode> getCanUseService(GetCanUseServiceRequest request) {
-        return request.getServices();
+    public GetAvailableServiceResponse getCanUseService(GetCanUseServiceRequest request) {
+        GetAvailableServiceResponse response = new GetAvailableServiceResponse();
+        response.setAvailableServices(request.getServices());
+        return response;
     }
 
     @Override
