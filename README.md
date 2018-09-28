@@ -37,8 +37,6 @@ rpc-benchmarks:　测试性能项目
 
 
 
-
-
 ### 开发记录
 rpc-server　负责注册服务　(服务名：项目名，接口地址，参数)
 
@@ -65,9 +63,7 @@ productservice中有服务（产品列表，产品操作）
 
 那么只需要在productservice中将产品操作服务屏蔽掉即可
 
-
 或者说：在服务管理控制台，动态控制某些机器的产品操作权重为０，则新请求不会打到此机器上．
-
 
 
 ### 服务治理
@@ -96,7 +92,7 @@ productservice中有服务（产品列表，产品操作）
 7.增加调用日志的处理用于rpc-monitor使用 OK
 8.增加权重，监测中心  OK
 9.rpc-monitor：监测中心,性能,主要用于采集性能
-10.rpc-config功能:基于mysql配置服务权重,redis进行缓存　,服务鉴权配置,服务限流配置
+10.rpc-config功能:基于mysql配置服务权重,redis进行缓存　,服务鉴权配置,服务限流配置，网关路由配置
 11.rpc-trace-es:封装调用日志，提供查询接口,
 12.引入本地缓存，当注册中心不可用或注册中心地址不可用时，使用本地缓存的服务地址
 13.rpc-manager是一个web项目,用于提供管理权重，查看服务流量，查看调用链,查看监控,
@@ -152,7 +148,7 @@ RAW日志异步输出到队列,交由netty进行处理，netty收到后，使用
 
 
 
-### 服务网关
+### rpc-gateway 服务网关
 第一步：
 增加项目
 rpc-gateway
@@ -214,14 +210,68 @@ rpc-trace-es 项目也挂了
 结论:rpc-trace-es也做成web服务好一些．rpcclient和rpc-manager挂了都不影响rpc-trace-es正常提供服务（写日志，查日志）
 
 
+### rpc-monitor设计　
+
+rpc-monitor-agent为探针，各个service项目上进行安装　，负责上报系统信息
+
+rpc-monitor-server为服务端，负责收集系统信息
+
+计划使用技术:
+
+netty
 
 
 
+### 项目类型的划分　
+war包:
+
+rpc-config
+rpc-client
+rpc-server
+rpc-manager
+rpc-trace
+rpc-gateway
+rpc-monitor-server
+
+jar包:
+rpc-core
+rpc-interface
+rpc-loadbalance
+rpc-registry
+rpc-springsupport
+rpc-demo-interface
+rpc-benchmarks
+rpc-monitor-agent
 
 
+### rpc-manager项目功能　
+rpc-manager项目定位为rpc微服务统一管理　平台　，功能包括:
+
+服务治理：
+    权重，流量，服务权限配置，网关路由配置等　
+    
+服务日志:
+    追踪日志，400,500,错误，日志监控规则　
+    
+机器性能监控
+    jvm,tomcat,性能指标，监控规则　
+    
 
 
+### 思考以下概念如何加入到项目中
 
+服务降级
+      
+服务熔断
+
+服务限流：可考虑在网关项目rpc-gateway与rpc调用位置做，限流配置在rpc-config项目中
+
+服务隔离:调整服务权重＋服务熔断做隔离？
+
+
+假设client发送一个请求到server
+server收到请求并且处理不了，则应该进行熔断
+如果server挂了，client则应该换服务进行重试
 
 
 

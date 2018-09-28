@@ -1,4 +1,4 @@
-package com.dyingtosurvive.rpcmonitor;
+package com.dyingtosurvive;
 
 import static org.junit.Assert.assertTrue;
 
