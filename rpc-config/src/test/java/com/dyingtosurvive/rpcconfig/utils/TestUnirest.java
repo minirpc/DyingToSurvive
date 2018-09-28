@@ -2,7 +2,7 @@ package com.dyingtosurvive.rpcconfig.utils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.dyingtosurvive.rpccore.common.ApiResult;
-import com.dyingtosurvive.rpcinterface.model.ServiceType;
+import com.dyingtosurvive.rpcinterface.model.ServiceWeight;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import org.junit.Test;
@@ -25,13 +25,13 @@ public class TestUnirest {
 
     @Test
     public void testParseList() throws Exception {
-        ServiceType serviceType = new ServiceType();
-        serviceType.setPackageName("com.dyingtosurvive.rpcconfig.service.IWeightService");
+        ServiceWeight serviceType = new ServiceWeight();
+        serviceType.setServiceInterface("com.dyingtosurvive.rpcconfig.service.IWeightService");
         serviceType.setCreatedBy("zhibing.chen");
         serviceType.setServiceName("IWeightService");
 
 
-        List<ServiceType>  aa = new ArrayList<>();
+        List<ServiceWeight>  aa = new ArrayList<>();
         aa.add(serviceType);
         String json = JSONObject.toJSONString(aa);
 

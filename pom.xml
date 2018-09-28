@@ -23,6 +23,7 @@
     <module>rpc-interface</module>
     <module>rpc-config</module>
     <module>rpc-gateway</module>
+    <module>rpc-benchmarks</module>
   </modules>
 
   <properties>

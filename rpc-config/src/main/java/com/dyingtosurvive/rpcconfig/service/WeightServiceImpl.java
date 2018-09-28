@@ -3,7 +3,7 @@ package com.dyingtosurvive.rpcconfig.service;
 import com.alibaba.fastjson.JSONObject;
 import com.dyingtosurvive.rpcinterface.model.GetAvailableServiceResponse;
 import com.dyingtosurvive.rpcinterface.model.GetCanUseServiceRequest;
-import com.dyingtosurvive.rpcinterface.model.ServiceType;
+import com.dyingtosurvive.rpcinterface.model.ServiceWeight;
 import com.dyingtosurvive.rpcinterface.model.ZKNode;
 import com.dyingtosurvive.rpcinterface.service.IWeightService;
 import org.springframework.stereotype.Service;
@@ -16,17 +16,17 @@ import java.util.List;
 @Service("weightService")
 public class WeightServiceImpl implements IWeightService {
     @Override
-    public ServiceType getServiceById(String id) {
-        ServiceType serviceType = new ServiceType();
-        serviceType.setId(id);
-        serviceType.setPackageName("com.dyingtosurvive.rpcconfig.service.IWeightService");
+    public ServiceWeight getServiceById(String id) {
+        ServiceWeight serviceType = new ServiceWeight();
+        serviceType.setId(null);
+        serviceType.setServiceInterface("com.dyingtosurvive.rpcconfig.service.IWeightService");
         serviceType.setCreatedBy("zhibing.chen");
         serviceType.setServiceName("IWeightService");
         return serviceType;
     }
 
     @Override
-    public List<ServiceType> getAllServices() {
+    public List<ServiceWeight> getAllServices() {
         return null;
     }
 

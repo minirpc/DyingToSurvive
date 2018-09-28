@@ -28,9 +28,12 @@ rpc-manager:统一的管理平台　（治理平台）
 
 rpc-gateway:服务网关
 
+rpc-benchmarks:　测试性能项目
+
+
 ### rpc-monitor与rpc-trace功能的定位:
-- rpc-monitor是监控中心，如500,400,CPU,内存指标
-- rpc-trace是追踪系统，提供调用链，
+- rpc-monitor是监控中心，如500,400,CPU,内存指标，重心在机器，jvm,cpu,内存上
+- rpc-trace是追踪系统，提供调用链，raw日志，性能日志，重心在日志上
 
 
 
@@ -89,9 +92,9 @@ productservice中有服务（产品列表，产品操作）
 3.使用spring自定义xml来解析注册中心和自动装配 OK
 4.还将学会自定义xml标签 OK
 5.加入service与reference的配置 OK
-6.增加调用的回调设计　
-7.增加调用日志的处理用于rpc-monitor使用
-8.增加权重，监测中心
+6.增加调用的回调设计
+7.增加调用日志的处理用于rpc-monitor使用 OK
+8.增加权重，监测中心  OK
 9.rpc-monitor：监测中心,性能,主要用于采集性能
 10.rpc-config功能:基于mysql配置服务权重,redis进行缓存　,服务鉴权配置,服务限流配置
 11.rpc-trace-es:封装调用日志，提供查询接口,
@@ -121,6 +124,8 @@ productservice中有服务（产品列表，产品操作）
 - 日志切面，将日志放入到rpc-trace-es中,使用rocketmq进行消息发送，减少对业务的侵入
 - threadlocal追踪header信息
 - guavacache或springcache
+- 使用springjdbctemplate封装数据库操作
+　
 
 ### 计划引入技术　
 - netty
@@ -168,6 +173,49 @@ API接口的访问权限控制
 
 
 此项目需要引入API接口的访问权限控制,
+
+
+
+
+
+### 基于jdbcTemplate封装一个ＯＲＭ框架　
+rpc-core中为核心代码,
+ 
+rpc-trace-es为jar项目　
+访问rpc-trace-es中的资源是以serviceloader方式的
+
+如在rpc-client中引入了rpc-trace-es jar包，当发生请求时，会将请求放入到es中．
+
+在rpc-manager中也需要引入rpc-trace-es jar包，当要读取数据时，使用serviceloader的方式来读取es中的数据
+
+
+
+思考：rpcconfig与rpc-trace-es项目区别在哪儿里，
+rpcconfig可否使用jar的形式集成到service中
+
+rpcconfig项目会操作数据库，redis
+
+rpc-trace-es项目会操作es
+
+rpc-manager项目管理rpcconfig项目　是通过　api访问的
+rpc-trace-es项目管理es是通过serviceloader访问的．
+
+
+假设只有rpcclient,和rpc-manager
+当rpcclient挂了，rpcclient中的rpc-trace-es也挂了．
+
+rpc-manager中的rpc-trace-es没有挂，可以继承得到数据
+
+如果　rpc-manager也挂了
+
+rpc-trace-es 项目也挂了
+
+
+结论:rpc-trace-es也做成web服务好一些．rpcclient和rpc-manager挂了都不影响rpc-trace-es正常提供服务（写日志，查日志）
+
+
+
+
 
 
 
