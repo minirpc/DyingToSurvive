@@ -8,5 +8,8 @@ import java.util.Map;
  */
 public interface JDBCCallBack<T> {
     Integer insert(String sql);
+
     List<Map<String, Object>> select(String sql);
+
+    Integer update(String sql);
 }

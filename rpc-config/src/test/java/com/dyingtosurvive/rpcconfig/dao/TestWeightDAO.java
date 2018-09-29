@@ -11,6 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
+
 /**
  * Created by change-solider on 18-9-26.
  */
@@ -24,7 +26,14 @@ public class TestWeightDAO {
 
     @Test
     public void testSaveData() {
-        Integer id = weightDAO.saveServiceWeight(null);
+        ServiceWeight serviceWeight = new ServiceWeight();
+        serviceWeight.setApplicationName("rpc-config");
+        serviceWeight.setCreatedBy("lizi");
+        serviceWeight.setServiceInterface("rpcservicewwgiss");
+        serviceWeight.setServiceName("rpcservice");
+        serviceWeight.setUpdatedBy("zhibing.chen");
+        serviceWeight.setWeight(200);
+        Integer id = weightDAO.saveServiceWeight(serviceWeight);
         System.out.println(id);
     }
 
@@ -33,4 +42,22 @@ public class TestWeightDAO {
         ServiceWeight serviceWeight = weightDAO.selectByPrimaryKey(2);
         System.out.println(JSONObject.toJSONString(serviceWeight));
     }
+
+    @Test
+    public void testUpdateByPrimaryKey() {
+        //ServiceWeight serviceWeight = weightDAO.selectByPrimaryKey(2);
+        ServiceWeight serviceWeight = new ServiceWeight();
+        serviceWeight.setId(2);
+        serviceWeight.setCreatedBy("zhiqiang");
+        Integer id = weightDAO.updateServiceWeightByPrimaryKey(serviceWeight);
+        System.out.println(id);
+    }
+
+
+    @Test
+    public void testSelectForList() {
+        List<ServiceWeight> serviceWeights = weightDAO.selectForList("rpc-config", null, null, null, null);
+        System.out.println(JSONObject.toJSONString(serviceWeights));
+    }
+
 }

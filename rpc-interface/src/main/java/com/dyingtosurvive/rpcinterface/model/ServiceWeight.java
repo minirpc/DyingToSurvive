@@ -9,7 +9,7 @@ import com.dyingtosurvive.rpcinterface.db.annotation.*;
  */
 @RPCTable(tableName = "service_weight")
 public class ServiceWeight implements Serializable {
-    @RPCField(fieldName = "id", fieldType = "Integer")
+    @RPCField(fieldName = "id", fieldType = "Integer",isPrimaryKey = true)
     private Integer id;
     @RPCField(fieldName = "service_name", fieldType = "String")
     private String serviceName;

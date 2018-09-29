@@ -2,7 +2,7 @@ package com.dyingtosurvive.rpccore.proxy;
 
 import com.alibaba.fastjson.JSONObject;
 import com.dyingtosurvive.rpccore.common.RPCHttpRequest;
-import com.dyingtosurvive.rpccore.common.TraceLog;
+import com.dyingtosurvive.rpcinterface.model.TraceLog;
 import com.dyingtosurvive.rpccore.common.ZKInfo;
 import com.dyingtosurvive.rpcinterface.model.GetAvailableServiceResponse;
 import com.dyingtosurvive.rpcinterface.model.GetCanUseServiceRequest;
@@ -12,7 +12,7 @@ import com.dyingtosurvive.rpccore.registry.RegistryConfig;
 import com.dyingtosurvive.rpccore.registry.Registry;
 import com.dyingtosurvive.rpccore.registry.RegistryFactory;
 import com.dyingtosurvive.rpccore.spi.RPCServiceLoader;
-import com.dyingtosurvive.rpccore.trace.ServiceLogger;
+import com.dyingtosurvive.rpcinterface.service.IServiceLogger;
 import com.dyingtosurvive.rpcinterface.service.IWeightService;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -173,13 +173,16 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
     }
 
     private void handleTrace(String url, HttpResponse<String> response, Object result) {
+        //todo 发送日志给rpc-trace-es
+
+
         //SPI日志追踪，可选插件
-        ServiceLoader<ServiceLogger> serviceLoggers = RPCServiceLoader.load(ServiceLogger.class);
-        Iterator<ServiceLogger> serviceLoggerIterator = serviceLoggers.iterator();
+        ServiceLoader<IServiceLogger> serviceLoggers = RPCServiceLoader.load(IServiceLogger.class);
+        Iterator<IServiceLogger> serviceLoggerIterator = serviceLoggers.iterator();
         if (!serviceLoggerIterator.hasNext()) {
             return;
         }
-        ServiceLogger serviceLogger = serviceLoggerIterator.next();
+        IServiceLogger serviceLogger = serviceLoggerIterator.next();
         TraceLog traceLog = new TraceLog();
         traceLog.setFromProject("rpcclient");
         traceLog.setRequestUrl(url);

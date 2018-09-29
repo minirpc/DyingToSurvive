@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>rpc-trace-es</artifactId>
+    <packaging>war</packaging>
 
     <name>rpc-trace-es</name>
     <!-- FIXME change it to the project's website -->

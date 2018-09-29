@@ -104,10 +104,110 @@ public class DBUtils<T> {
     }
 
 
+    private Map<String, Object> getFieldAndValueMap(T t) {
+        try {
+            Map<String, Object> fieldAndValueMap = new HashMap<>();
+            Map<String, RPCField> rpcFieldMap = getFieldAndDefineMap();
+            for (Map.Entry<String, RPCField> entry : rpcFieldMap.entrySet()) {
+                String key = entry.getKey();
+                RPCField rpcField = entry.getValue();
+                if (rpcField.isPrimaryKey()) {
+                    //是主键则下一个
+                    continue;
+                }
+                Field field = ref.getDeclaredField(key);
+                field.setAccessible(true);
+                Object value = field.get(t);
+                if (value != null) {
+                    fieldAndValueMap.put(key, value);
+                }
+            }
+            return fieldAndValueMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IllegalStateException("生成插入语句失败");
+        }
+    }
+
     public String generateInsertSQL(T t) {
         String tableName = getTableName();
-        String insertSQL = "insert into " + tableName + " ()";
+        String insertSQL = "insert into " + tableName + " (";
 
+        Map<String, RPCField> rpcFieldMap = getFieldAndDefineMap();
+        Map<String, Object> fieldAndValueMap = getFieldAndValueMap(t);
+
+        for (Map.Entry<String, Object> entry : fieldAndValueMap.entrySet()) {
+            insertSQL = insertSQL.concat(rpcFieldMap.get(entry.getKey()).fieldName()).concat(",");
+        }
+        insertSQL = insertSQL.substring(0, insertSQL.length() - 1);
+        insertSQL = insertSQL.concat(") values(");
+        for (Map.Entry<String, Object> entry : fieldAndValueMap.entrySet()) {
+            if ("String".equals(rpcFieldMap.get(entry.getKey()).fieldType())) {
+                String value = (String) entry.getValue();
+                insertSQL = insertSQL.concat("\"").concat(value).concat("\"").concat(",");
+            } else if ("Integer".equals(rpcFieldMap.get(entry.getKey()).fieldType())) {
+                Integer value = (Integer) entry.getValue();
+                insertSQL = insertSQL.concat("" + value).concat(",");
+            } else if ("Long".equals(rpcFieldMap.get(entry.getKey()).fieldType())) {
+                Long value = (Long) entry.getValue();
+                insertSQL = insertSQL.concat("" + value).concat(",");
+            }
+        }
+        insertSQL = insertSQL.substring(0, insertSQL.length() - 1);
+        insertSQL = insertSQL.concat(");");
+        System.out.println("insertSQL:" + insertSQL);
         return insertSQL;
+    }
+
+    public Integer getPrimaryKeyValue(T t) {
+        try {
+            Map<String, RPCField> rpcFieldMap = getFieldAndDefineMap();
+            for (Map.Entry<String, RPCField> entry : rpcFieldMap.entrySet()) {
+                RPCField rpcField = entry.getValue();
+                if (!rpcField.isPrimaryKey()) {
+                    //是主键则下一个
+                    continue;
+                }
+                Field field = ref.getDeclaredField(entry.getKey());
+                field.setAccessible(true);
+                Integer value = (Integer) field.get(t);
+                return value;
+            }
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IllegalStateException("生成插入语句失败");
+        }
+    }
+
+    public String generateUpdateByPrimaryKeySQL(T t) {
+        String sql = "update " + getTableName() + "  set ";
+        Map<String, Object> fieldAndValueMap = getFieldAndValueMap(t);
+        Map<String, RPCField> rpcFieldMap = getFieldAndDefineMap();
+        for (Map.Entry<String, Object> entry : fieldAndValueMap.entrySet()) {
+            sql = sql.concat(rpcFieldMap.get(entry.getKey()).fieldName()).concat(" = ");
+            sql = sql.concat("\"").concat((String) entry.getValue()).concat("\"");
+        }
+        sql = sql.concat(" where id = " + getPrimaryKeyValue(t)).concat(";");
+        return sql;
+    }
+
+    public String must(String applicationName) {
+        return " = \"" + applicationName + "\"";
+    }
+
+    public String generateSelectSQL(Map<String, String> params) {
+        String sql = "select * from " + getTableName();
+        if (params == null || params.size() == 0) {
+            return sql;
+        }
+        sql = sql.concat(" where ");
+        Map<String, RPCField> rpcFieldMap = getFieldAndDefineMap();
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            String key = entry.getKey();
+            String fieldName = rpcFieldMap.get(key).fieldName();
+            sql = sql.concat(fieldName).concat(entry.getValue());
+        }
+        return sql;
     }
 }

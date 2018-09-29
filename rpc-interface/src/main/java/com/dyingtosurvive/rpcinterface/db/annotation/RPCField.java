@@ -14,4 +14,6 @@ public @interface RPCField {
     String fieldName();
 
     String fieldType();
+
+    boolean isPrimaryKey() default false;
 }

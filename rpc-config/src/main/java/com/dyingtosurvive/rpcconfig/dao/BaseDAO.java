@@ -20,13 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
- *
- *　模板方法模式
- *
+ * 　模板方法模式
+ * <p>
  * AbstractBaseDAO控制主要流程，BaseDAO需要提供jdbctemplate的实现
- *
- *
+ * <p>
+ * <p>
  * Created by change-solider on 18-9-27.
  */
 @Repository
@@ -54,6 +52,12 @@ public class BaseDAO<T> extends AbstractBaseDAO<T> {
             public List<Map<String, Object>> select(String sql) {
                 List<Map<String, Object>> result = jdbcTemplate.queryForList(sql);
                 return result;
+            }
+
+            @Override
+            public Integer update(final String sql) {
+                System.out.println("aaa");
+                return jdbcTemplate.update(sql);
             }
         };
     }

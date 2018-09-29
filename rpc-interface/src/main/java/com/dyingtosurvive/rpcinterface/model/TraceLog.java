@@ -1,4 +1,4 @@
-package com.dyingtosurvive.rpccore.common;
+package com.dyingtosurvive.rpcinterface.model;
 
 import java.util.Date;
 

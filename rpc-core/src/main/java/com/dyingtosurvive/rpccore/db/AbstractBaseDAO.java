@@ -47,4 +47,27 @@ public abstract class AbstractBaseDAO<T> {
         }
         return dbUtils.parseResult(result.get(0));
     }
+
+    protected List<T> selectForList(Map<String, String> params) {
+        DBUtils<T> dbUtils = DBUtils.buildDBUtils(ClassUtils.getClassObject(this.getClass()));
+        String sql = dbUtils.generateSelectSQL(params);
+        if (jdbcCallBack == null) {
+            jdbcCallBack = injectJDBCCallBack();
+        }
+        List<Map<String, Object>> result = jdbcCallBack.select(sql);
+        if (result == null || result.size() == 0) {
+            return null;
+        }
+        return dbUtils.parseResult(result);
+    }
+
+    protected Integer updateByPrimaryKey(T t) {
+        DBUtils<T> dbUtils = DBUtils.buildDBUtils(ClassUtils.getClassObject(this.getClass()));
+        String sql = dbUtils.generateUpdateByPrimaryKeySQL(t);
+        if (jdbcCallBack == null) {
+            jdbcCallBack = injectJDBCCallBack();
+        }
+        jdbcCallBack.update(sql);
+        return dbUtils.getPrimaryKeyValue(t);
+    }
 }
