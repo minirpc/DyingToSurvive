@@ -2,8 +2,11 @@
 /home/change-solider/workspaces/ownProjects/DyingToSurvive/rpc-interface/src/main/java/com/dyingtosurvive/rpcinterface/model/ZKNode.java
 /home/change-solider/workspaces/ownProjects/DyingToSurvive/rpc-interface/src/main/java/com/dyingtosurvive/rpcinterface/db/annotation/RPCTable.java
 /home/change-solider/workspaces/ownProjects/DyingToSurvive/rpc-interface/src/main/java/com/dyingtosurvive/rpcinterface/model/ServiceWeight.java
+/home/change-solider/workspaces/ownProjects/DyingToSurvive/rpc-interface/src/main/java/com/dyingtosurvive/rpcinterface/model/TraceLog.java
 /home/change-solider/workspaces/ownProjects/DyingToSurvive/rpc-interface/src/main/java/com/dyingtosurvive/rpcinterface/service/IWeightService.java
 /home/change-solider/workspaces/ownProjects/DyingToSurvive/rpc-interface/src/main/java/com/dyingtosurvive/rpcinterface/model/Router.java
+/home/change-solider/workspaces/ownProjects/DyingToSurvive/rpc-interface/src/main/java/com/dyingtosurvive/rpcinterface/model/GetServiceListResponse.java
 /home/change-solider/workspaces/ownProjects/DyingToSurvive/rpc-interface/src/main/java/com/dyingtosurvive/rpcinterface/model/GetAvailableServiceResponse.java
 /home/change-solider/workspaces/ownProjects/DyingToSurvive/rpc-interface/src/main/java/com/dyingtosurvive/rpcinterface/db/annotation/RPCField.java
 /home/change-solider/workspaces/ownProjects/DyingToSurvive/rpc-interface/src/main/java/com/dyingtosurvive/rpcinterface/model/GetCanUseServiceRequest.java
+/home/change-solider/workspaces/ownProjects/DyingToSurvive/rpc-interface/src/main/java/com/dyingtosurvive/rpcinterface/service/IServiceLogger.java

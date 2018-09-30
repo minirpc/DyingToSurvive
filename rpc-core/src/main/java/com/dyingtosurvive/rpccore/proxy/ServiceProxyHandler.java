@@ -2,6 +2,10 @@ package com.dyingtosurvive.rpccore.proxy;
 
 import com.alibaba.fastjson.JSONObject;
 import com.dyingtosurvive.rpccore.common.RPCHttpRequest;
+import com.dyingtosurvive.rpccore.message.MessageAwareConfig;
+import com.dyingtosurvive.rpccore.message.MessageChannel;
+import com.dyingtosurvive.rpccore.message.MessageChannelFactory;
+import com.dyingtosurvive.rpccore.utils.SPIPoolUtils;
 import com.dyingtosurvive.rpcinterface.model.TraceLog;
 import com.dyingtosurvive.rpccore.common.ZKInfo;
 import com.dyingtosurvive.rpcinterface.model.GetAvailableServiceResponse;
@@ -173,31 +177,49 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
     }
 
     private void handleTrace(String url, HttpResponse<String> response, Object result) {
-        //todo 发送日志给rpc-trace-es
+        //todo 发送日志消息,不能让日志写入阻塞了用户线程
+        //todo 此处需要使用线程池异步写消息
+        //如果不考虑性能，写日志也使用rpc方式，会产生配置中心，写es循环调用的问题，
+        //使用SPI的方式，选择消息中间件进行日志消息处理
+        MessageChannelFactory factory = SPIPoolUtils.getMessageChannelFactory();
+        /*ServiceLoader<MessageChannelFactory> factories = RPCServiceLoader.load(MessageChannelFactory.class);
+        Iterator<MessageChannelFactory> operationIterator = factories.iterator();
+        if (!operationIterator.hasNext()) {
+            throw new IllegalStateException("请提供RegistryFactory的实现!");
+        }*/
+        //todo MessageChannelFactory不应该每次都使用serviceloader加载，应该全局可用
+        //MessageChannelFactory factory = operationIterator.next();
+        MessageAwareConfig config = new MessageAwareConfig();
+        //todo config待从配置文件中取
+        config.setGroupName("rpc-trace");
+        config.setNameServerAddress("10.42.0.15:9876;10.42.0.16:9876;10.42.0.17:9876");
+        config.setTopic("rpc-trace-message");
+        MessageChannel messageChannel = factory.buildMessageChannel(config);
+        TraceLog traceLog = buildTraceLog(url, response, result);
+        messageChannel.writeMessage(JSONObject.toJSONString(traceLog));
+        hello();
+    }
 
+    private void hello() {
+        MessageChannelFactory factory = SPIPoolUtils.getMessageChannelFactory();
+        factory.buildMessageChannel(null);
+    }
 
-        //SPI日志追踪，可选插件
-        ServiceLoader<IServiceLogger> serviceLoggers = RPCServiceLoader.load(IServiceLogger.class);
-        Iterator<IServiceLogger> serviceLoggerIterator = serviceLoggers.iterator();
-        if (!serviceLoggerIterator.hasNext()) {
-            return;
-        }
-        IServiceLogger serviceLogger = serviceLoggerIterator.next();
+    private TraceLog buildTraceLog(String url, HttpResponse<String> response, Object result) {
         TraceLog traceLog = new TraceLog();
         traceLog.setFromProject("rpcclient");
         traceLog.setRequestUrl(url);
         traceLog.setToProject("rpcserver");
         traceLog.setRequestTimestamp(new Date());
         traceLog.setResponseTimestamp(new Date());
-        traceLog
-            .setRequestDuration(traceLog.getResponseTimestamp().getTime() - traceLog.getRequestTimestamp().getTime());
+        traceLog.setRequestDuration(
+            traceLog.getResponseTimestamp().getTime() - traceLog.getRequestTimestamp().getTime());
         traceLog.setRequestId(UUID.randomUUID().toString());
         traceLog.setTraceId(UUID.randomUUID().toString());
         traceLog.setResponseCode(response.getStatusText());
         traceLog.setResponseBody(result);
-        serviceLogger.writeLog(traceLog);
+        return traceLog;
     }
-
 
     private RPCHttpRequest generateRPCHttpRequest(ZKNode choseNode, Method method, Object[] args) throws Exception {
         RPCHttpRequest httpRequest = new RPCHttpRequest();

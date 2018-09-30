@@ -23,5 +23,4 @@
 
     <rpc:service interface="com.dyingtosurvive.rpcinterface.service.IServiceLogger" ref="serviceLogger"/>
 
-
 </beans>

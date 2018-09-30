@@ -17,6 +17,6 @@ public class ServiceLoggerImpl implements IServiceLogger {
 
     @Override
     public void readLog() {
-
+        System.out.println("readlog");
     }
 }
