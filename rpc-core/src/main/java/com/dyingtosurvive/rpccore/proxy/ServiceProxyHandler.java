@@ -181,14 +181,14 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
         //todo 此处需要使用线程池异步写消息
         //如果不考虑性能，写日志也使用rpc方式，会产生配置中心，写es循环调用的问题，
         //使用SPI的方式，选择消息中间件进行日志消息处理
-        MessageChannelFactory factory = SPIPoolUtils.getMessageChannelFactory();
-        /*ServiceLoader<MessageChannelFactory> factories = RPCServiceLoader.load(MessageChannelFactory.class);
+        //MessageChannelFactory factory = SPIPoolUtils.getMessageChannelFactory();
+        ServiceLoader<MessageChannelFactory> factories = RPCServiceLoader.load(MessageChannelFactory.class);
         Iterator<MessageChannelFactory> operationIterator = factories.iterator();
         if (!operationIterator.hasNext()) {
             throw new IllegalStateException("请提供RegistryFactory的实现!");
-        }*/
+        }
         //todo MessageChannelFactory不应该每次都使用serviceloader加载，应该全局可用
-        //MessageChannelFactory factory = operationIterator.next();
+        MessageChannelFactory factory = operationIterator.next();
         MessageAwareConfig config = new MessageAwareConfig();
         //todo config待从配置文件中取
         config.setGroupName("rpc-trace");
@@ -197,12 +197,6 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
         MessageChannel messageChannel = factory.buildMessageChannel(config);
         TraceLog traceLog = buildTraceLog(url, response, result);
         messageChannel.writeMessage(JSONObject.toJSONString(traceLog));
-        hello();
-    }
-
-    private void hello() {
-        MessageChannelFactory factory = SPIPoolUtils.getMessageChannelFactory();
-        factory.buildMessageChannel(null);
     }
 
     private TraceLog buildTraceLog(String url, HttpResponse<String> response, Object result) {

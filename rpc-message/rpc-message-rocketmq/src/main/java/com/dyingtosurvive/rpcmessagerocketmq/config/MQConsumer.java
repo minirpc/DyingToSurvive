@@ -20,12 +20,11 @@ import java.util.concurrent.ConcurrentSkipListSet;
 public class MQConsumer {
     private DefaultMQPushConsumer consumer;
     private ConcurrentSkipListSet<MessageListener> listeners = new ConcurrentSkipListSet<>();
-
     public MQConsumer(MessageAwareConfig config) {
-        consumer = new DefaultMQPushConsumer("please_rename_unique_group_name_4");
-        consumer.setNamesrvAddr("10.42.0.15:9876;10.42.0.16:9876;10.42.0.17:9876");
+        consumer = new DefaultMQPushConsumer(config.getGroupName());
+        consumer.setNamesrvAddr(config.getNameServerAddress());
         try {
-            consumer.subscribe("TopicTest", "*");
+            consumer.subscribe(config.getTopic(), "*");
             consumer.start();
         } catch (MQClientException e) {
             e.printStackTrace();
@@ -37,6 +36,7 @@ public class MQConsumer {
                 ConsumeConcurrentlyContext context) {
                 //todo 收到消息后，转发给多个消费者
                 String message = JSONObject.toJSONString(msgs);
+                System.out.println("receive message:" + message);
                 for (MessageListener messageListener : listeners) {
                     messageListener.consumeMessage(message);
                 }

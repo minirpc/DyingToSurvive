@@ -17,6 +17,7 @@ public class SPIPoolUtils {
     }
 
     public static MessageChannelFactory getMessageChannelFactory() {
+        //todo 待使用factory工厂来管理spi插件
         if (messageChannelFactory != null) {
             return messageChannelFactory;
         }

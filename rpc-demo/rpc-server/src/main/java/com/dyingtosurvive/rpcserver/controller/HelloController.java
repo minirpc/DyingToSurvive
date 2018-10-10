@@ -24,6 +24,7 @@ public class HelloController {
 
     @RequestMapping(value = "/hello")
     public String helloDyingToService(@RequestParam(value = "helloMessage") String helloMessage) {
+        System.out.println("aaahello");
         return helloService.helloDyingToService(helloMessage);
     }
 

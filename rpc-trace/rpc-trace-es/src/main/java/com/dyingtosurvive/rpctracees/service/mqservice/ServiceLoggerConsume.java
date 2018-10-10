@@ -24,7 +24,7 @@ public class ServiceLoggerConsume {
         ServiceLoader<MessageChannelFactory> factories = RPCServiceLoader.load(MessageChannelFactory.class);
         Iterator<MessageChannelFactory> operationIterator = factories.iterator();
         if (!operationIterator.hasNext()) {
-            throw new IllegalStateException("请提供RegistryFactory的实现!");
+            throw new IllegalStateException("请提供MessageChannelFactory的实现!");
         }
         MessageChannelFactory factory = operationIterator.next();
         MessageAwareConfig config = new MessageAwareConfig();

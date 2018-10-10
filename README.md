@@ -1,6 +1,10 @@
 # DyingToSurvive
 java实现的最小的使用http方式的rpc框架
 
+### 总则
+- 能自己实现就不依赖第三方,自己实现难度大才依赖第三方
+
+
 
 ###　项目结构
 
@@ -31,6 +35,8 @@ rpc-gateway:服务网关
 rpc-benchmarks:　测试性能项目
 
 rpc-message:封装消息中心
+
+
 
 ### rpc-monitor与rpc-trace功能的定位:
 - rpc-monitor是监控中心，如500,400,CPU,内存指标，重心在机器，jvm,cpu,内存上
@@ -127,7 +133,11 @@ productservice中有服务（产品列表，产品操作）
 ### 计划引入技术　
 - netty
 - nginx
-websocket
+- websocket
+- 池化http请求
+- 日志统一输出
+- 线程池，线程组，监控，线程隔离
+
 
 
 ### 一些想法
@@ -187,7 +197,7 @@ rpc-trace-es为jar项目　
 
 
 
-思考：rpcconfig与rpc-trace-es项目区别在哪儿里，
+### 思考：rpcconfig与rpc-trace-es项目区别在哪儿里，
 rpcconfig可否使用jar的形式集成到service中
 
 rpcconfig项目会操作数据库，redis
@@ -221,6 +231,13 @@ rpc-monitor-server为服务端，负责收集系统信息
 
 netty
 
+复杂和时间不可控业务建议投递到后端业务线程池统一处理
+不推荐业务和I/O线程共用同一个线程
+
+在rpc-monitor-agent使用使用netty建立与rpc-monitor-server的链接
+当rpc-monitor-server收到数据后，将数据交由业务线程池进行处理，
+
+使用netty作为rpc通信框架时，请求需要有requestid, 业务线程池处理返回时，使用requestid回写数据
 
 
 ### 项目类型的划分　
@@ -239,20 +256,22 @@ rpc-core
 rpc-interface
 rpc-loadbalance
 rpc-registry
+rpc-message
 rpc-springsupport
 rpc-demo-interface
 rpc-benchmarks
 rpc-monitor-agent
 
 
+
 ### rpc-manager项目功能　
 rpc-manager项目定位为rpc微服务统一管理　平台　，功能包括:
 
 服务治理：
-    权重，流量，服务权限配置，网关路由配置等　
+    权重(rpc-config)，流量(rpc-config)，服务权限配置(rpc-config)，网关路由配置(rpc-config)等　
     
 服务日志:
-    追踪日志，400,500,错误，日志监控规则　
+    追踪日志(rpc-message,rpc-trace)，400,500,错误日志，日志监控规则　
     
 机器性能监控
     jvm,tomcat,性能指标，监控规则　
@@ -278,13 +297,15 @@ server收到请求并且处理不了，则应该进行熔断
 
 ### rocketmq
 使用rocketmq 作为消息中心件，负责转发日志消息
-
+rocketmq将作为rpc-message的一个实现方式
 
 
 
 ### rpc-message
+
 当Ａ调用Ｂ服务时，需要将调用日志通过消息中间件传入到rpc-trace中
 消息中间件的注入使用ＳＰＩ方式，做到解偶．
+
 
 
 
