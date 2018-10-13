@@ -22,19 +22,14 @@ import java.util.List;
  * Created by change-solider on 18-10-11.
  */
 public class NettyRPCClient implements RPCClient {
-
-
     private String monitorServerHost;
     private Integer monitorServerPort;
     private List<NettyClientHandler> handlers = new ArrayList<>();
 
-    public NettyRPCClient(String monitorServerHost, Integer monitorServerPort) {
-        this.monitorServerHost = monitorServerHost;
-        this.monitorServerPort = monitorServerPort;
-    }
-
     @Override
     public void buildClientAndConnectServer(String ip, Integer port) {
+        this.monitorServerHost = ip;
+        this.monitorServerPort = port;
         connectServer();
     }
 

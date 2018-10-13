@@ -12,7 +12,7 @@ import java.io.IOException;
 public class TestNettyRPCServer {
     public static void main(String[] args) {
         NettyRPCServer nettyRPCServer = new NettyRPCServer();
-        nettyRPCServer.buildServer(new RPCHandler() {
+        nettyRPCServer.buildServer("127.0.0.1", 18080, new RPCHandler() {
             @Override public RPCResponse handleReqeust(RPCRequest request) {
                 System.out.println("netty handle request");
                 RPCResponse response = new RPCResponse();

@@ -23,11 +23,21 @@ import java.util.List;
  * Created by change-solider on 18-10-11.
  */
 public class NettyRPCServer implements RPCServer {
+    private String ip;
+    private Integer port;
+
+
+
     private List<RPCHandler> rpcHandlerList = new ArrayList<>();
 
+    public NettyRPCServer() {
+        System.out.println("使用netty作为通信组件");
+    }
 
     @Override
-    public void buildServer(RPCHandler rpcHandler) {
+    public void buildServer(String ip, Integer port, RPCHandler rpcHandler) {
+        this.ip = ip;
+        this.port = port;
         rpcHandlerList.add(rpcHandler);
         try {
             start();
@@ -76,9 +86,9 @@ public class NettyRPCServer implements RPCServer {
                 .childOption(ChannelOption.SO_KEEPALIVE, true);
 
 
-            ChannelFuture future = bootstrap.bind("127.0.0.1", 18080).sync();
+            ChannelFuture future = bootstrap.bind(ip, port).sync();
 
-            System.out.println("Server started on port " + 18080 + " in host " + "localhost");
+            System.out.println("Server started on port " + port + " in host " + ip);
             future.addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture f) throws Exception {

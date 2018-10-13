@@ -18,11 +18,15 @@ import java.util.List;
  * Created by change-solider on 18-10-13.
  */
 public class HTTPRPCServer implements RPCServer, HttpHandler {
+    private String ip;
+    private Integer port;
+
     private List<RPCHandler> rpcHandlerList = new ArrayList<>();
 
     @Override
-    public void buildServer(RPCHandler rpcHandler) {
-
+    public void buildServer(String ip, Integer port, RPCHandler rpcHandler) {
+        this.ip = ip;
+        this.port = port;
         this.rpcHandlerList.add(rpcHandler);
         HttpServer server = null;
         try {

@@ -9,7 +9,7 @@ import com.dyingtosurvive.rpccore.communication.RPCResponse;
  */
 public class TestNettyRPCClient {
     public static void main(String[] args) {
-        NettyRPCClient nettyClient = new NettyRPCClient("127.0.0.1", 18080);
+        NettyRPCClient nettyClient = new NettyRPCClient();
         nettyClient.buildClientAndConnectServer("127.0.0.1", 18080);
         try {
             Thread.sleep(5000);

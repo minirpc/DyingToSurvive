@@ -24,7 +24,7 @@ public class HTTPRPCClient implements RPCClient {
 
     @Override
     public RPCResponse sendRPCRequest(RPCRequest request) {
-        String url = generateRequestUrl();
+        String url = generateRequestUrl(request);
         HttpResponse<String> response = null;
         try {
             response = Unirest.get(url).asString();
@@ -36,7 +36,9 @@ public class HTTPRPCClient implements RPCClient {
         return rpcResponse;
     }
 
-    private String generateRequestUrl() {
-        return "http://127.0.0.1:8001/123455";
+    private String generateRequestUrl(RPCRequest request) {
+        String url = "http://";
+        url = url.concat(ip).concat(":").concat("" + port).concat("/").concat(request.getUri());
+        return url;
     }
 }

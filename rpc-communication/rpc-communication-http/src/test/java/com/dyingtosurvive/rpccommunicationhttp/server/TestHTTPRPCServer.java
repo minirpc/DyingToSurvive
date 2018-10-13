@@ -16,7 +16,7 @@ public class TestHTTPRPCServer {
     @Test
     public void testServer() {
         HTTPRPCServer server = new HTTPRPCServer();
-        server.buildServer(new RPCHandler() {
+        server.buildServer("127.0.0.1", 8001, new RPCHandler() {
             @Override public RPCResponse handleReqeust(RPCRequest request) {
                 System.out.println("handlerequest");
                 return null;

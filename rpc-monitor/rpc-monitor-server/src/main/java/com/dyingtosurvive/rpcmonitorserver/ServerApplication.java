@@ -13,12 +13,13 @@ import org.springframework.context.annotation.ImportResource;
 @SpringBootApplication
 @Configuration
 @ImportResource(locations = {"classpath:rpc-monitor-server.xml"})
-@ComponentScan(basePackages = "com.dyingtosurvive.rpctracees")
+@ComponentScan(basePackages = "com.dyingtosurvive.rpcmonitorserver")
 @EnableAutoConfiguration
 public class ServerApplication extends SpringBootServletInitializer {
     static Logger log = LoggerFactory.getLogger(ServerApplication.class);
 
     public static void main(String[] args) {
         SpringApplication.run(SpringApplication.class, args);
+
     }
 }

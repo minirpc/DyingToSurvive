@@ -13,6 +13,7 @@
 
   <modules>
     <module>rpc-core</module>
+    <module>rpc-communication</module>
     <module>rpc-loadbalance</module>
     <module>rpc-registry</module>
     <module>rpc-springsupport</module>
@@ -25,7 +26,6 @@
     <module>rpc-monitor</module>
     <module>rpc-trace</module>
     <module>rpc-manager</module>
-    <module>rpc-communication</module>
   </modules>
 
   <properties>

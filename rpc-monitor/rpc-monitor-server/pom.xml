@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>rpc-monitor-server</artifactId>
-
+    <packaging>war</packaging>
     <name>rpc-monitor-server</name>
     <!-- FIXME change it to the project's website -->
     <url>http://www.example.com</url>
@@ -52,11 +52,11 @@
             <artifactId>rpc-communication-netty</artifactId>
             <version>1.0.1</version>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>com.dyingtosurvive</groupId>
             <artifactId>rpc-communication-http</artifactId>
             <version>1.0.1</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.dyingtosurvive</groupId>
             <artifactId>rpc-springsupport</artifactId>

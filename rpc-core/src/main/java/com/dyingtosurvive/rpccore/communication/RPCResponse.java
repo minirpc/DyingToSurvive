@@ -9,6 +9,8 @@ public class RPCResponse implements Serializable {
     private Integer code;
     private String message;
     private Object body;
+    private String requestId;
+
 
     public Integer getCode() {
         return code;
@@ -32,5 +34,13 @@ public class RPCResponse implements Serializable {
 
     public void setBody(Object body) {
         this.body = body;
+    }
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 }
