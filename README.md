@@ -5,7 +5,6 @@ java实现的最小的使用http方式的rpc框架
 - 能自己实现就不依赖第三方,自己实现难度大才依赖第三方
 
 
-
 ###　项目结构
 
 rpc-demo
@@ -44,19 +43,7 @@ rpc-message:封装消息中心
 
 
 
-### 开发记录
-rpc-server　负责注册服务　(服务名：项目名，接口地址，参数)
 
-rpc-client　负责使用服务：
-0.根据配置的注册中心找到注册中心
-1.从注册中心中，根据服务名查找已注册的服务，得到服务项目名，接口地址
-2.通过服务接口上的注解，查出参数
-3.使用ＬＢ算法命中一台机器　
-4.拼装请求url(项目名有了，接口地址也有了，参数也有了，)
-5.发送请求
-6.当动态代理访问时，先调用出registry,再由registry找出支持此服务的url然后再调用　
-7.http 支持post请求
-8.rpc-config包引入，可以根据rpcconfig中
 
 
 ### 实现效果　
@@ -89,20 +76,7 @@ productservice中有服务（产品列表，产品操作）
 
 服务追踪　
 
-### todo 
-1.服务注册中心　使用配置文件配置服务注册中心  OK
-2.使用lb和注册中心，需要是ＳＰＩ设计，确定服务注册中心的负载策略 OK
-3.使用spring自定义xml来解析注册中心和自动装配 OK
-4.还将学会自定义xml标签 OK
-5.加入service与reference的配置 OK
-6.增加调用的回调设计
-7.增加调用日志的处理用于rpc-monitor使用 OK
-8.增加权重，监测中心  OK
-9.rpc-monitor：监测中心,性能,主要用于采集性能
-10.rpc-config功能:基于mysql配置服务权重,redis进行缓存　,服务鉴权配置,服务限流配置，网关路由配置
-11.rpc-trace-es:封装调用日志，提供查询接口,
-12.引入本地缓存，当注册中心不可用或注册中心地址不可用时，使用本地缓存的服务地址
-13.rpc-manager是一个web项目,用于提供管理权重，查看服务流量，查看调用链,查看监控,
+
 
 
 
@@ -115,47 +89,7 @@ productservice中有服务（产品列表，产品操作）
 
 
 
-### 此项目关键技术　
-- jdk 动态代理　
-- spring标签定义　
-- java spi设计
-- zk操作
-- es操作(日志)
-- lb算法
-- redis操作
-- rocketmq操作
-- 日志切面，将日志放入到rpc-trace-es中,使用rocketmq进行消息发送，减少对业务的侵入
-- threadlocal追踪header信息
-- guavacache或springcache
-- 使用springjdbctemplate封装数据库操作
-　
 
-### 计划引入技术　
-- netty
-- nginx
-- websocket
-- 池化http请求
-- 日志统一输出
-- 线程池，线程组，监控，线程隔离
-
-
-
-### 一些想法
-RAW日志异步输出到队列,交由netty进行处理，netty收到后，使用websocket同步到web界面　
-
-多级缓存:springcache,google guavacache, nginx+lua访问rediscache
-
-秒杀场景:
-
-服务降级:服务端降级,rpc-core包
-
-服务限流
-
-服务鉴权：进行服务调用鉴权
-
-服务网关引入:
-第一类网关:聚合网关，完成数据聚合操作,类似于中台项目
-第二类网关:应用网关
 
 
 
@@ -232,12 +166,45 @@ rpc-monitor-server为服务端，负责收集系统信息
 netty
 
 复杂和时间不可控业务建议投递到后端业务线程池统一处理
+
 不推荐业务和I/O线程共用同一个线程
 
 在rpc-monitor-agent使用使用netty建立与rpc-monitor-server的链接
 当rpc-monitor-server收到数据后，将数据交由业务线程池进行处理，
 
 使用netty作为rpc通信框架时，请求需要有requestid, 业务线程池处理返回时，使用requestid回写数据
+
+rpc-monitor-server为web项目，
+主要功能为：
+1.收集agent上报来的监控指标
+2.将监控指标存储，为提供查询接口
+
+
+
+
+### rpc-manager项目功能　
+rpc-manager项目定位为rpc微服务统一管理　平台　，功能包括:
+
+服务治理：
+    权重(rpc-config)，流量(rpc-config)，服务权限配置(rpc-config)，网关路由配置(rpc-config)等　
+    
+服务日志:
+    追踪日志(rpc-message,rpc-trace)，400,500,错误日志，日志监控规则　
+    
+机器性能监控
+    jvm,tomcat,性能指标，监控规则　
+    
+### rpc-message-rocketmq
+使用rocketmq 作为消息中心件，负责转发日志消息
+rocketmq将作为rpc-message的一个实现方式
+
+
+### rpc-message
+
+当Ａ调用Ｂ服务时，需要将调用日志通过消息中间件传入到rpc-trace中
+消息中间件的注入使用ＳＰＩ方式，做到解偶．
+
+
 
 
 ### 项目类型的划分　
@@ -264,18 +231,24 @@ rpc-monitor-agent
 
 
 
-### rpc-manager项目功能　
-rpc-manager项目定位为rpc微服务统一管理　平台　，功能包括:
+### rpc-communication
+建立基础通信组件
+为后续项目提供通信的基础框架
+通信组件主要包含client端和server端
 
-服务治理：
-    权重(rpc-config)，流量(rpc-config)，服务权限配置(rpc-config)，网关路由配置(rpc-config)等　
-    
-服务日志:
-    追踪日志(rpc-message,rpc-trace)，400,500,错误日志，日志监控规则　
-    
-机器性能监控
-    jvm,tomcat,性能指标，监控规则　
-    
+server端用于建立服务
+client端用于访问服务　
+
+在使用具体的通信组件时，需要确保server端与client是一致的，即都使用同一个具体组件，
+
+### rpc-communication-http
+使用httpserver建立的通信组件，使用http作为通信组件
+
+### rpc-communication-netty
+使用netty建立的通信组件，使用netty作为通信组件
+
+
+
 
 
 ### 思考以下概念如何加入到项目中
@@ -295,20 +268,92 @@ server收到请求并且处理不了，则应该进行熔断
 
 
 
-### rocketmq
-使用rocketmq 作为消息中心件，负责转发日志消息
-rocketmq将作为rpc-message的一个实现方式
+
+
+### 此项目关键技术　
+- jdk 动态代理　
+- spring标签定义　
+- java spi设计
+- zk操作
+- es操作(日志)
+- lb算法
+- redis操作
+- rocketmq操作
+- 日志切面，将日志放入到rpc-trace-es中,使用rocketmq进行消息发送，减少对业务的侵入
+- threadlocal追踪header信息
+- guavacache或springcache
+- 使用springjdbctemplate封装数据库操作
+　
+
+### 计划引入技术　
+- netty
+- nginx
+- websocket
+- 池化http请求
+- 日志统一输出
+- 线程池，线程组，监控，线程隔离
 
 
 
-### rpc-message
+### 一些想法
+RAW日志异步输出到队列,交由netty进行处理，netty收到后，使用websocket同步到web界面　
 
-当Ａ调用Ｂ服务时，需要将调用日志通过消息中间件传入到rpc-trace中
-消息中间件的注入使用ＳＰＩ方式，做到解偶．
+多级缓存:springcache,google guavacache, nginx+lua访问rediscache
+
+秒杀场景:
+
+服务降级:服务端降级,rpc-core包
+
+服务限流
+
+服务鉴权：进行服务调用鉴权
+
+服务网关引入:
+第一类网关:聚合网关，完成数据聚合操作,类似于中台项目
+第二类网关:应用网关
+
+### 开发记录
+rpc-server　负责注册服务　(服务名：项目名，接口地址，参数)
+
+rpc-client　负责使用服务：
+0.根据配置的注册中心找到注册中心
+1.从注册中心中，根据服务名查找已注册的服务，得到服务项目名，接口地址
+2.通过服务接口上的注解，查出参数
+3.使用ＬＢ算法命中一台机器　
+4.拼装请求url(项目名有了，接口地址也有了，参数也有了，)
+5.发送请求
+6.当动态代理访问时，先调用出registry,再由registry找出支持此服务的url然后再调用　
+7.http 支持post请求
+8.rpc-config包引入，可以根据rpcconfig中
+
+### todo 
+1.服务注册中心　使用配置文件配置服务注册中心  OK
+2.使用lb和注册中心，需要是ＳＰＩ设计，确定服务注册中心的负载策略 OK
+3.使用spring自定义xml来解析注册中心和自动装配 OK
+4.还将学会自定义xml标签 OK
+5.加入service与reference的配置 OK
+6.增加调用的回调设计
+7.增加调用日志的处理用于rpc-monitor使用 OK
+8.增加权重，监测中心  OK
+9.rpc-monitor：监测中心,性能,主要用于采集性能
+10.rpc-config功能:基于mysql配置服务权重,redis进行缓存　,服务鉴权配置,服务限流配置，网关路由配置
+11.rpc-trace-es:封装调用日志，提供查询接口,
+12.引入本地缓存，当注册中心不可用或注册中心地址不可用时，使用本地缓存的服务地址
+13.rpc-manager是一个web项目,用于提供管理权重，查看服务流量，查看调用链,查看监控,
+14.rpc-client访问rpc-server时，会将追踪日志通过rpc-message传递到rpc-trace项目中:已打通
+15.
 
 
+服务治理做更多的扩展。比如：
 
+　　1.基于版本号的服务管理，可以用于灰度发布。
 
+　　2.请求的复制回放，用于模拟真实的流量进行压测。
 
+　　3.给请求打标签用于实时的在线压测。
+
+　　4.更灵活的负载均衡和路由策略。
+
+　　5.内置的熔断机制，避免整个分布式系统产生雪崩效应。
 
 

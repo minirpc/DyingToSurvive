@@ -1,10 +1,12 @@
 package com.dyingtosurvive.rpctracees.service.mqservice;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dyingtosurvive.rpccore.message.MessageAwareConfig;
 import com.dyingtosurvive.rpccore.message.MessageChannel;
 import com.dyingtosurvive.rpccore.message.MessageChannelFactory;
 import com.dyingtosurvive.rpccore.message.MessageListener;
 import com.dyingtosurvive.rpccore.spi.RPCServiceLoader;
+import com.dyingtosurvive.rpcinterface.model.TraceLog;
 import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
@@ -38,7 +40,10 @@ public class ServiceLoggerConsume {
             public String consumeMessage(String message) {
                 //todo message为收取到的消息
                 System.out.println("已收到消息:" + message);
-                return null;
+                System.out.println("aaa");
+                TraceLog traceLog = JSONObject.parseObject(message,TraceLog.class);
+                System.out.println("已将消息转换为tracelog对象," + JSONObject.toJSONString(traceLog));
+                return "success";
             }
         });
     }

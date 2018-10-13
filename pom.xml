@@ -25,6 +25,7 @@
     <module>rpc-monitor</module>
     <module>rpc-trace</module>
     <module>rpc-manager</module>
+    <module>rpc-communication</module>
   </modules>
 
   <properties>

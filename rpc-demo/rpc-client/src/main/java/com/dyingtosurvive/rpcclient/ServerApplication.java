@@ -8,6 +8,8 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 
+import java.util.BitSet;
+
 @Configuration
 @ImportResource(locations= {"classpath:rpc-client.xml"})
 @SpringBootApplication
