@@ -4,6 +4,7 @@ import com.dyingtosurvive.rpccore.communication.RPCServer;
 import com.dyingtosurvive.rpccore.communication.RPCHandler;
 import com.dyingtosurvive.rpccore.communication.RPCRequest;
 import com.dyingtosurvive.rpccore.communication.RPCResponse;
+import com.dyingtosurvive.rpccore.communication.ServerInfo;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -64,6 +65,15 @@ public class HTTPRPCServer implements RPCServer, HttpHandler {
             return rpcHandler.handleReqeust(request);
         }
         return null;
+    }
+
+    @Override
+    public ServerInfo getServerInfo() {
+        ServerInfo serverInfo = new ServerInfo();
+        serverInfo.setIp(ip);
+        serverInfo.setPort(port);
+        serverInfo.setMethod("http");
+        return serverInfo;
     }
 }
 

@@ -6,6 +6,7 @@ import com.dyingtosurvive.rpccore.communication.RPCServer;
 import com.dyingtosurvive.rpccore.communication.RPCHandler;
 import com.dyingtosurvive.rpccore.communication.RPCRequest;
 import com.dyingtosurvive.rpccore.communication.RPCResponse;
+import com.dyingtosurvive.rpccore.communication.ServerInfo;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -99,4 +100,12 @@ public class NettyRPCServer implements RPCServer {
         }
     }
 
+    @Override
+    public ServerInfo getServerInfo() {
+        ServerInfo serverInfo = new ServerInfo();
+        serverInfo.setIp(ip);
+        serverInfo.setPort(port);
+        serverInfo.setMethod("netty");
+        return serverInfo;
+    }
 }

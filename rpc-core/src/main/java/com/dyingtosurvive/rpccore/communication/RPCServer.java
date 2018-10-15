@@ -8,4 +8,6 @@ public interface RPCServer {
 
     RPCResponse handleRPCRequest(RPCRequest request);
 
+    ServerInfo getServerInfo();
+
 }
