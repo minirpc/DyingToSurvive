@@ -8,30 +8,20 @@
         <version>1.0.1</version>
     </parent>
 
-
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.dyingtosurvive</groupId>
     <artifactId>rpc-client</artifactId>
-    <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <name>rpc-client</name>
-    <!-- FIXME change it to the project's website -->
-    <url>http://www.example.com</url>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-    </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.0.2.RELEASE</version>
+                <version>${springboot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -43,12 +33,12 @@
         <dependency>
             <groupId>com.dyingtosurvive</groupId>
             <artifactId>rpc-demo-interface</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.dyingtosurvive</groupId>
             <artifactId>rpc-springsupport</artifactId>
-            <version>1.0.1</version>
+            <version>${project.parent.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -59,28 +49,22 @@
         <dependency>
             <groupId>com.dyingtosurvive</groupId>
             <artifactId>rpc-core</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.dyingtosurvive</groupId>
             <artifactId>rpc-registry-zk</artifactId>
-            <version>1.0.1</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.dyingtosurvive</groupId>
             <artifactId>rpc-loadbalance</artifactId>
-            <version>1.0.1</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.dyingtosurvive</groupId>
             <artifactId>rpc-message-rocketmq</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -108,24 +92,5 @@
             <artifactId>log4j-over-slf4j</artifactId>
         </dependency>
 
-
     </dependencies>
-
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

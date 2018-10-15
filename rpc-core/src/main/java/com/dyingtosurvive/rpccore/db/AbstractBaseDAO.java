@@ -3,7 +3,6 @@ package com.dyingtosurvive.rpccore.db;
 import com.alibaba.fastjson.JSONObject;
 import com.dyingtosurvive.rpccore.utils.ClassUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

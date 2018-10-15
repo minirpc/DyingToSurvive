@@ -1,7 +1,6 @@
 package com.dyingtosurvive.rpcmonitoragent.gather;
 
 
-import com.dyingtosurvive.rpccommunicationhttp.client.HTTPRPCClient;
 import com.dyingtosurvive.rpccore.communication.RPCClient;
 import com.dyingtosurvive.rpccore.communication.RPCRequest;
 import com.dyingtosurvive.rpccore.communication.RPCResponse;
