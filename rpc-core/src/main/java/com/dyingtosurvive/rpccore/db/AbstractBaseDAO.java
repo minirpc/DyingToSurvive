@@ -15,7 +15,7 @@ import java.util.Map;
  * <p>
  * Created by change-solider on 18-9-27.
  */
-public abstract class AbstractBaseDAO<T> {
+public abstract class AbstractBaseDAO<T>  {
     private volatile JDBCCallBack<T> jdbcCallBack;
 
     protected abstract JDBCCallBack injectJDBCCallBack();

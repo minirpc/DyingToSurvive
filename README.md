@@ -342,7 +342,7 @@ rpc-client　负责使用服务：
 13.rpc-manager是一个web项目,用于提供管理权重，查看服务流量，查看调用链,查看监控,
 14.rpc-client访问rpc-server时，会将追踪日志通过rpc-message传递到rpc-trace项目中:已打通
 15.rpc-communication包封装
-
+16.接口版本管理(提供接口降级这样的需求)
 
 
 服务治理做更多的扩展。比如：
@@ -358,3 +358,4 @@ rpc-client　负责使用服务：
 　　5.内置的熔断机制，避免整个分布式系统产生雪崩效应。
 
 
+![avatar](http://on-img.com/chart_image/5bc97cbce4b08faf8c83ee6d.png?_=1540020487577)
