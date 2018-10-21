@@ -126,7 +126,7 @@ client端用于访问服务　
 #####  rpc-communication-netty
 使用netty建立的通信组件，使用netty作为通信组件
 
-####  rpc-gateway 服务网关
+####  rpc-gateway 
 负责请求路由到后端服务上
 
 #### rpc-monitor设计　
@@ -163,22 +163,21 @@ rpc-manager项目定位为rpc微服务统一管理平台,功能包括:
 ### 微服务框架在集群部署后的架构图如下：
 ![avatar](http://on-img.com/chart_image/5bc97cbce4b08faf8c83ee6d.png?_=1540020487577)
 
-
 ### todo＆开发日志 
-1.服务注册中心　使用配置文件配置服务注册中心  OK
-2.使用lb和注册中心，需要是ＳＰＩ设计，确定服务注册中心的负载策略 OK
-3.使用spring自定义xml来解析注册中心和自动装配 OK
-4.还将学会自定义xml标签 OK
-5.加入service与reference的配置 OK
-6.增加调用的回调设计
-7.增加调用日志的处理用于rpc-monitor使用 OK
-8.增加权重，监测中心  OK
-9.rpc-monitor：监测中心,性能,主要用于采集性能
-10.rpc-config功能:基于mysql配置服务权重,redis进行缓存　,服务鉴权配置,服务限流配置，网关路由配置
-11.rpc-trace-es:封装调用日志，提供查询接口,
-12.引入本地缓存，当注册中心不可用或注册中心地址不可用时，使用本地缓存的服务地址
-13.rpc-manager是一个web项目,用于提供管理权重，查看服务流量，查看调用链,查看监控,
-14.rpc-client访问rpc-server时，会将追踪日志通过rpc-message传递到rpc-trace项目中:已打通
-15.rpc-communication包封装
-16.接口版本管理(提供接口降级这样的需求)
+* 1.服务注册中心　使用配置文件配置服务注册中心  OK
+* 2.使用lb和注册中心，需要是ＳＰＩ设计，确定服务注册中心的负载策略 OK
+* 3.使用spring自定义xml来解析注册中心和自动装配 OK
+* 4.还将学会自定义xml标签 OK
+* 5.加入service与reference的配置 OK
+* 6.增加调用的回调设计
+* 7.增加调用日志的处理用于rpc-monitor使用 OK
+* 8.增加权重，监测中心  OK
+* 9.rpc-monitor：监测中心,性能,主要用于采集性能
+* 10.rpc-config功能:基于mysql配置服务权重,redis进行缓存　,服务鉴权配置,服务限流配置，网关路由配置
+* 11.rpc-trace-es:封装调用日志，提供查询接口,
+* 12.引入本地缓存，当注册中心不可用或注册中心地址不可用时，使用本地缓存的服务地址
+* 13.rpc-manager是一个web项目,用于提供管理权重，查看服务流量，查看调用链,查看监控,
+* 14.rpc-client访问rpc-server时，会将追踪日志通过rpc-message传递到rpc-trace项目中:已打通
+* 15.rpc-communication包封装
+* 16.接口版本管理(提供接口降级这样的需求)
 
