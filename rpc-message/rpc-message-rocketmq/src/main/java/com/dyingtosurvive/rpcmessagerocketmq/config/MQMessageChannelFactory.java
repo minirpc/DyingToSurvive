@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
  * Created by change-solider on 18-9-30.
  */
 public class MQMessageChannelFactory implements MessageChannelFactory {
+    //享元模式
     private ConcurrentHashMap<MessageAwareConfig, MessageChannel> channelMap = new ConcurrentHashMap<>();
 
     @Override

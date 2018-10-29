@@ -18,6 +18,7 @@ public class TestNettyRPCServer {
                 RPCResponse response = new RPCResponse();
                 response.setCode(200);
                 response.setMessage("请求成功");
+                response.setRequestId(request.getRequestId());
                 return response;
             }
         });

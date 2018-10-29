@@ -1,6 +1,7 @@
 package com.dyingtosurvive.rpcmonitoragent.gather;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.dyingtosurvive.rpccore.communication.RPCClient;
 import com.dyingtosurvive.rpccore.communication.RPCRequest;
 import com.dyingtosurvive.rpccore.communication.RPCResponse;
@@ -9,6 +10,9 @@ import com.dyingtosurvive.rpccore.spi.RPCServiceLoader;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
 
 /**
  * Created by change-solider on 18-10-11.
@@ -39,6 +43,22 @@ public class RPCMonitorAgent {
     public void gatherSystemInfo() {
         //todo 定时收集系统信息，并使用
         RPCRequest rpcRequest = new RPCRequest();
+        rpcRequest.setBody(null);
+        rpcRequest.setUri("/getusers");
+        rpcRequest.setRequestId(UUID.randomUUID().toString());
+        System.out.println("request:" + JSONObject.toJSONString(rpcRequest));
         RPCResponse response = rpcClient.sendRPCRequest(rpcRequest);
+        System.out.println("response:" + JSONObject.toJSONString(response));
+    }
+
+
+
+    public void startGather() {
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override public void run() {
+                gatherSystemInfo();
+            }
+        }, 1000, 1000);
     }
 }
