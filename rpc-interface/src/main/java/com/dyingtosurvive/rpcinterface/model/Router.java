@@ -6,6 +6,8 @@ package com.dyingtosurvive.rpcinterface.model;
 public class Router {
     private String appliation;
     private String uri;
+    private String ip;
+    private String port;
 
     public String getAppliation() {
         return appliation;
@@ -21,5 +23,21 @@ public class Router {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
     }
 }

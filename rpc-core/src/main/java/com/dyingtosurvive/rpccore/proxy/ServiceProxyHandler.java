@@ -153,7 +153,6 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
         }
         System.out.println("methodreturntype:" + method.getReturnType());
         Object object = JSONObject.parseObject(response.getBody(), method.getReturnType());
-
         //todo trace处理
         //handleTrace(request.getUrl(), response, object);
         return object;
@@ -242,9 +241,14 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
                     }
                 }
             }
+            mapurl = mapurl.concat("?");
             for (int i = 0; i < args.length; ++i) {
-                params.get(i);
-                mapurl = mapurl + "?" + params.get(i) + "=" + (args[i].equals(null) ? "" : args[i].toString());
+                if (args[i] != null) {
+                    mapurl = mapurl +  params.get(i) + "=" + args[i].toString() +"&";
+                }
+            }
+            if (mapurl.endsWith("&")) {
+                mapurl = mapurl.substring(0,mapurl.length() - 1);
             }
             url = url.concat(mapurl);
         } else {

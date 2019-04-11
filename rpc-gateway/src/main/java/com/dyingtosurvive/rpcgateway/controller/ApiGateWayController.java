@@ -29,10 +29,12 @@ public class ApiGateWayController {
     @RequestMapping(value = "/**")
     public Object dispatchRequestMethod(HttpServletRequest request, HttpServletResponse response) {
         //1.通过服务调用找到应用名称　
-        Router router = routerService.getRoutersByUri(request.getRequestURI());
+        String uri = request.getRequestURI();
+        Router router = routerService.getRoutersByUri(uri);
         //todo 2.根据应用名称和注册中心，找到服务提供者
         //todo 3.使用lb算法决定调用的服务提供者
-        String address = "http://127.0.0.1:8080/" + router.getAppliation() + "/helloservice/hello?message=111";
+        //String address = "http://"+router.getIp()+":"+router.getPort()+"/" + router.getAppliation() + "/helloservice/hello?message=111";
+        String address = "http://"+router.getIp()+":"+router.getPort()+"/" + router.getAppliation() + "/" + router.getUri();
         System.out.println("address:" + address);
         Object result = null;
         try {

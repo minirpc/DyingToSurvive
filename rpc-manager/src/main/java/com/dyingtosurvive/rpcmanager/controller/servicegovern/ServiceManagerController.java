@@ -39,5 +39,4 @@ public class ServiceManagerController {
         @RequestParam(value = "status",required = false) String status, @RequestParam(value = "createdBy",required = false) String createdBy) {
         return weightService.selectForList(applicationName, serviceName, serviceInterface, status, createdBy);
     }
-
 }
