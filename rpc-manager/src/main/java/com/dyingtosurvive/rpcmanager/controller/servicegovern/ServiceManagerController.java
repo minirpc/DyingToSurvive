@@ -33,10 +33,10 @@ public class ServiceManagerController {
      */
     @RequestMapping(value = "/service/list", method = RequestMethod.GET)
     public GetServiceListResponse selectForList(
-        @RequestParam(value = "applicationName") String applicationName,
-        @RequestParam(value = "serviceName") String serviceName,
-        @RequestParam(value = "serviceInterface") String serviceInterface,
-        @RequestParam(value = "status") String status, @RequestParam(value = "createdBy") String createdBy) {
+        @RequestParam(value = "applicationName",required = false) String applicationName,
+        @RequestParam(value = "serviceName",required = false) String serviceName,
+        @RequestParam(value = "serviceInterface",required = false) String serviceInterface,
+        @RequestParam(value = "status",required = false) String status, @RequestParam(value = "createdBy",required = false) String createdBy) {
         return weightService.selectForList(applicationName, serviceName, serviceInterface, status, createdBy);
     }
 

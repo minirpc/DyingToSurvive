@@ -2,21 +2,19 @@ package com.dyingtosurvive.rpccore.proxy;
 
 import com.alibaba.fastjson.JSONObject;
 import com.dyingtosurvive.rpccore.common.RPCHttpRequest;
+import com.dyingtosurvive.rpccore.common.ZKInfo;
+import com.dyingtosurvive.rpccore.lb.LoadBalance;
 import com.dyingtosurvive.rpccore.message.MessageAwareConfig;
 import com.dyingtosurvive.rpccore.message.MessageChannel;
 import com.dyingtosurvive.rpccore.message.MessageChannelFactory;
-import com.dyingtosurvive.rpccore.utils.SPIPoolUtils;
-import com.dyingtosurvive.rpcinterface.model.TraceLog;
-import com.dyingtosurvive.rpccore.common.ZKInfo;
-import com.dyingtosurvive.rpcinterface.model.GetAvailableServiceResponse;
-import com.dyingtosurvive.rpcinterface.model.GetCanUseServiceRequest;
-import com.dyingtosurvive.rpcinterface.model.ZKNode;
-import com.dyingtosurvive.rpccore.lb.LoadBalance;
-import com.dyingtosurvive.rpccore.registry.RegistryConfig;
 import com.dyingtosurvive.rpccore.registry.Registry;
+import com.dyingtosurvive.rpccore.registry.RegistryConfig;
 import com.dyingtosurvive.rpccore.registry.RegistryFactory;
 import com.dyingtosurvive.rpccore.spi.RPCServiceLoader;
-import com.dyingtosurvive.rpcinterface.service.IServiceLogger;
+import com.dyingtosurvive.rpcinterface.model.GetAvailableServiceResponse;
+import com.dyingtosurvive.rpcinterface.model.GetCanUseServiceRequest;
+import com.dyingtosurvive.rpcinterface.model.TraceLog;
+import com.dyingtosurvive.rpcinterface.model.ZKNode;
 import com.dyingtosurvive.rpcinterface.service.IWeightService;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -246,7 +244,7 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
             }
             for (int i = 0; i < args.length; ++i) {
                 params.get(i);
-                mapurl = mapurl + "?" + params.get(i) + "=" + args[i].toString();
+                mapurl = mapurl + "?" + params.get(i) + "=" + (args[i].equals(null) ? "" : args[i].toString());
             }
             url = url.concat(mapurl);
         } else {

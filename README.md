@@ -191,4 +191,6 @@ tomcat部署的应用名为rpcserver
 3.启动rpc-client
 tomcat部署的应用名为rpc-client
 
+4.rpc-config项目依赖mysql机器
 
+dao层是自己实现的

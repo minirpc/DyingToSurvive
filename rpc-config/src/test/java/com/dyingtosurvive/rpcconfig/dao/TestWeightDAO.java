@@ -29,7 +29,7 @@ public class TestWeightDAO {
         ServiceWeight serviceWeight = new ServiceWeight();
         serviceWeight.setApplicationName("rpc-config");
         serviceWeight.setCreatedBy("lizi");
-        serviceWeight.setServiceInterface("rpcservicewwgiss");
+        serviceWeight.setServiceInterface("testinterface");
         serviceWeight.setServiceName("rpcservice");
         serviceWeight.setUpdatedBy("zhibing.chen");
         serviceWeight.setWeight(200);

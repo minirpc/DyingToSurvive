@@ -27,9 +27,9 @@ public interface IWeightService {
     void writeWeightInfo(ZKNode choseNode);
 
     @RequestMapping(value = "/service/list", method = RequestMethod.GET) GetServiceListResponse selectForList(
-        @RequestParam(value = "applicationName") String applicationName,
-        @RequestParam(value = "serviceName") String serviceName,
-        @RequestParam(value = "serviceInterface") String serviceInterface,
-        @RequestParam(value = "status") String status,
-        @RequestParam(value = "createdBy") String createdBy);
+        @RequestParam(value = "applicationName",required = false) String applicationName,
+        @RequestParam(value = "serviceName",required = false) String serviceName,
+        @RequestParam(value = "serviceInterface",required = false) String serviceInterface,
+        @RequestParam(value = "status",required = false) String status,
+        @RequestParam(value = "createdBy",required = false) String createdBy);
 }
