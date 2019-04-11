@@ -181,3 +181,14 @@ rpc-manager项目定位为rpc微服务统一管理平台,功能包括:
 * 15.rpc-communication包封装
 * 16.接口版本管理(提供接口降级这样的需求)
 
+### 启动流程
+1.启动zk机器, zk已开启开机自启动，无须手动启动
+2.启动rpc-server
+配置应用，使用如下方式测试请求是否相通
+http://localhost:8080/rpcserver/hello?helloMessage=123456444
+tomcat部署的应用名为rpcserver
+
+3.启动rpc-client
+tomcat部署的应用名为rpc-client
+
+

@@ -156,8 +156,8 @@ public class ServiceProxyHandler<T> implements InvocationHandler {
         System.out.println("methodreturntype:" + method.getReturnType());
         Object object = JSONObject.parseObject(response.getBody(), method.getReturnType());
 
-        //trace处理
-        handleTrace(request.getUrl(), response, object);
+        //todo trace处理
+        //handleTrace(request.getUrl(), response, object);
         return object;
     }
 
