@@ -194,3 +194,11 @@ tomcat部署的应用名为rpc-client
 4.rpc-config项目依赖mysql机器
 
 dao层是自己实现的
+
+
+### todo 
+编写部署rpc-gateway项目脚本，部署到６台tomcat上
+tomcat开机自启动 done
+nginx开机自启动 done
+keepalived开机自启动 done
+使用了ansible
